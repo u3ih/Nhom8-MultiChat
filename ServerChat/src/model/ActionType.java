@@ -12,4 +12,8 @@ public class ActionType {
     public static final String NOTIFY_JUST_JOIN_ROOM = "8";
     public static final String NOTIFY_JUST_LEAVE_ROOM = "9";
     public static final String LOGOUT = "10";
+    public static final String GET_ROOM_MEMBER = "11";
+    public static final String Close_WINDOW_CHAT = "12";
+    public static final String GET_MESS = "13";
+    public static final String SEND_FILE = "14";
 }

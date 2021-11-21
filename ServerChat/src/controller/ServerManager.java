@@ -7,17 +7,18 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import dao.room.RoomDAO;
 import dao.user.UserDAO;
 import model.ActionType;
+import model.DataFile;
+import model.Message;
 import model.ResultCode;
 import model.Room;
 import model.User;
@@ -36,6 +37,7 @@ public class ServerManager extends Observable
     
     DataInputStream mDataInputStream;
     DataOutputStream mDataOutputStream;
+    RoomDAO dao = new RoomDAO();
     
     public ServerManager(Observer obs)  //hàm khởi tạo khi chưa có socket
     {
@@ -107,6 +109,7 @@ public class ServerManager extends Observable
                         	socket.close();
                         	continue;
                         }
+
                         
                         mListUserOnline.add(newUser);
                         System.out.println(mListUserOnline);
@@ -164,8 +167,21 @@ public class ServerManager extends Observable
             //server cần nhận thông tin liên tục của nhiều người, nên ko thể sử dụng DataInputStream để đợi nhận yêu cầu của một người
             //mà cần chạy liên tục để nhận yêu cầu của bất cứ ai ngay lập tức
             String request = user.Read();
-            if(request!=null)
-                ProcessRequest(user, request);
+            DataFile file = new DataFile();
+            if(request!=null) {
+            	String[] lines = request.split(";",-1);
+                String actionType = lines[0];
+                String roomID = lines[1];
+                System.out.println(actionType + " " + roomID);
+                if(actionType.equals(ActionType.SEND_FILE)) {
+                	file = user.ReadFile();
+                	System.out.println("file: " + file.getName());
+                	ProcessSendFile(user, roomID, file);
+                } else {
+                	ProcessRequest(user, request);
+                }
+            }
+                
         }
     }
     
@@ -199,9 +215,14 @@ public class ServerManager extends Observable
         mListUserWaitLogout.clear();
     }
     
+    void ProcessSendFile(User user, String roomID, DataFile file) {     
+        notifyObservers(user.getLastName() + " vừa gửi file");
+        user.getRoom(roomID).SendFileToAllUser(user.getLastName(), file, user.getUsername());
+    }
+    
     void ProcessRequest(User user, String request)
     {
-        String[] lines = request.split(";");
+        String[] lines = request.split(";",-1);
         String actionType = lines[0];
         switch (actionType)
         {
@@ -209,7 +230,7 @@ public class ServerManager extends Observable
             {
                     user.setOnline(true);
                     user.Send(actionType, ResultCode.OK, "OK");
-                    notifyObservers(user.getLastName() + " vừa đăng nhập thành công");
+                    notifyObservers(user.getUsername() + " vừa đăng nhập thành công");
                 
                 break;
             }
@@ -218,24 +239,19 @@ public class ServerManager extends Observable
                 String roomName = lines[1];  //query có dạng actionType;roomName
                 Room room = GeneralRoom(roomName);
                 mListRoom.add(room);
-                user.setmRoom(room);
+                user.addRoom(room.getIdRoom(), room);
                 if(user.Send(actionType, ResultCode.OK, room.getIdRoom()))
                     room.AddUser(user);
-                notifyObservers(user.getLastName() + " vừa tạo phòng " + roomName);
+                notifyObservers(user.getUsername() + " vừa tạo phòng " + roomName);
                 break;
             }
             case ActionType.GET_LIST_ROOM:
             {
-                int size = mListRoom.size();//query có dạng actionType;
+                List<Room> list = user.getListRoom();//query có dạng actionType;
+                int size = list.size();
                 int rowsPerBlock = 500;    //số phòng gửi về mỗi block
                 if(size>0)
                 {
-                    /*Nếu có quá nhiều phòng(2000 chẳng hạn) thì 1 chuỗi string(1 lần gửi) sẽ không
-                    thể chứa hết được thông tin của tất cả phòng
-                    nên ta chia ra từng block gửi nhiều lần.
-                    Trong thực tế thì có thể sử dụng chức năng phân trang, nhưng trong project này
-                    không phân trang nên lựa chọn cách thức này
-                    */
                     String listRoom = "";
                     int start=0;
                     int end=0;
@@ -247,7 +263,7 @@ public class ServerManager extends Observable
                         listRoom = "";
                         for (int j = start; j < end; j++) 
                         {
-                            Room room = mListRoom.get(j);
+                            Room room = list.get(j);
                             listRoom+= room.getIdRoom() + "<col>" + room.getNameRoom() + "<col>" + room.CountUser() + "<col>" + "<row>";
                         }
                         System.out.print("Gửi lần thứ: " + i);
@@ -257,7 +273,7 @@ public class ServerManager extends Observable
                     listRoom = "";
                     for (int i = end; i < size; i++) //gửi nốt những phòng còn lại
                     {
-                        Room room = mListRoom.get(i);
+                        Room room = list.get(i);
                         listRoom+= room.getIdRoom() + "<col>" + room.getNameRoom() + "<col>" + room.CountUser() + "<col>" + "<row>";
                     }
                     user.Send(actionType, ResultCode.OK, listRoom);
@@ -265,9 +281,70 @@ public class ServerManager extends Observable
                 {
                     user.Send(actionType, ResultCode.OK, "");
                 }
-                notifyObservers(user.getLastName() + " vừa lấy danh sách phòng");
+                notifyObservers(user.getUsername() + " vừa lấy danh sách phòng");
                 break;
             }
+            case ActionType.GET_MESS:
+            {
+            	
+                Room room = user.getRoom(lines[1]);//query có dạng actionType;
+                List<Message> list = room.getListMess();
+                int size = list.size();
+                if(size>0)
+                {
+                    
+                    String listMess = "";
+                    for (int i = 0; i < size; i++) 
+                    {
+                        
+                            Message mess = list.get(i);
+                            listMess+= mess.getSender() + "<col>" + mess.getMess() + "<col>" + "<row>";
+                        
+                        
+                    }
+                    user.Send(actionType, ResultCode.OK,lines[1] + ";" + listMess);
+                    
+                    
+                }else
+                {
+                    user.Send(actionType, ResultCode.OK, "");
+                }
+                notifyObservers(user.getLastName() + " vừa lấy list tin nhắn");
+                break;
+            }
+//            case ActionType.GET_ROOM_MEMBER:
+//            {
+//            	
+//                List<User> list = user.getRoom(lines[1]).getmListUser();//query có dạng actionType;
+//                int size = list.size();
+//   //số phòng gửi về mỗi block
+//                if(size>0)
+//                {
+//                    /*Nếu có quá nhiều phòng(2000 chẳng hạn) thì 1 chuỗi string(1 lần gửi) sẽ không
+//                    thể chứa hết được thông tin của tất cả phòng
+//                    nên ta chia ra từng block gửi nhiều lần.
+//                    Trong thực tế thì có thể sử dụng chức năng phân trang, nhưng trong project này
+//                    không phân trang nên lựa chọn cách thức này
+//                    */
+//                    String listMess = "";
+//                    for (int i = 0; i < 21; i++) 
+//                    {
+//                        
+//                            String name = list.get(i).getUsername();
+//                            listMess+= name + ";";
+//                        
+//                        
+//                    }
+//                    user.Send(actionType, ResultCode.OK, listMess);
+//                    
+//                    
+//                }else
+//                {
+//                    user.Send(actionType, ResultCode.OK, "");
+//                }
+//                notifyObservers(user.getLastName() + " vừa lấy danh sách phòng");
+//                break;
+//            }
             case ActionType.JOIN_ROOM:
             {
                 String maPhong = lines[1];   //query có dạng actionType;maPhong
@@ -279,34 +356,39 @@ public class ServerManager extends Observable
                     if(room.getIdRoom().equals(maPhong))
                     {
                         room.AddUser(user);
-                        user.setmRoom(room);
-                        user.Send(actionType, ResultCode.OK, maPhong);
-                        notifyObservers(user.getLastName() + " vừa tham gia phòng " + room.getIdRoom());
-                        user.getmRoom().UpdateNumberUser();
-                        user.getmRoom().NotifyJustJoinRoom(user);
+                        user.addRoom(room.getIdRoom(),room);
+                        String count = room.getmListUser().size()+"";
+                        user.Send(actionType, ResultCode.OK, room.getNameRoom() + ";" + count);
+                        notifyObservers(user.getUsername() + " vừa tham gia phòng " + room.getIdRoom());
+                        user.getRoom(room.getIdRoom()).UpdateNumberUser();
+                        user.getRoom(room.getIdRoom()).NotifyJustJoinRoom(user);
                         success = true;
                     }
                 }
                 if(success==false)
                 {
                     user.Send(actionType, ResultCode.ERROR, "Không tìm thấy phòng");
-                    notifyObservers(user.getMidName() + " không thể tham gia phòng " + maPhong);
+                    notifyObservers(user.getUsername() + " không thể tham gia phòng " + maPhong);
                 }
                 
                 break;
             }
             case ActionType.SEND_MESSAGE:
             {
+            	System.out.println(lines[1] +" " + lines[2]);
                 String contentMess = "";
                 if(lines.length>=2)
-                    contentMess = lines[1];   //query có dạng actionType;contentMess
-                user.getmRoom().SendToAllUser(user.getLastName(), contentMess);
-                notifyObservers(user.getLastName() + " vừa gửi tin");
+                    contentMess = lines[2];   //query có dạng actionType;contentMess
+                user.getRoom(lines[1]).SendToAllUser(user.getUsername(), contentMess);
+                user.getRoom(lines[1]).addMess(user.getUsername(), contentMess);
+                System.out.println(user.getUsername() + " " + contentMess + "\n");
+                notifyObservers(user.getUsername() + " vừa gửi tin");
                 break;
             }
+            
             case ActionType.LEAVE_ROOM:    //query có dạng actionType;
             {
-                Room room = user.getmRoom();
+                Room room = user.getRoom("gf");
                 room.RemoveUser(user);
                 if(room.CountUser()>0)
                 {
@@ -316,12 +398,12 @@ public class ServerManager extends Observable
                 else
                     mListRoom.remove(room);
                 user.setmRoom(null);
-                notifyObservers(user.getLastName() + " vừa rời phòng");
+                notifyObservers(user.getUsername() + " vừa rời phòng");
                 break;
             }
             case ActionType.LOGOUT:    //query có dạng actionType;
             {
-                Room room = user.getmRoom();
+                Room room = user.getRoom("gfd");
                 if(room!=null)
                 {
                     room.RemoveUser(user);
@@ -336,7 +418,7 @@ public class ServerManager extends Observable
                 //vì mListUser luôn được sử dụng bởi thread đợi kết quả, nên can thiệp vào giữa chừng rất dễ gây lỗi
                 //Nên ta sử dụng một list hàng đợi, thread đợi kết quả sẽ xóa các user này khi duyệt đợi kết quả xong
                 mListUserWaitLogout.add(user); 
-                notifyObservers(user.getLastName() + " vừa đăng xuất");
+                notifyObservers(user.getUsername() + " vừa đăng xuất");
                 break;
 
             }
@@ -367,7 +449,7 @@ public class ServerManager extends Observable
                 maxChar++;
             
             maPhong = RandomString(maxChar);
-            countRandom++;  //tăng số lần đềm random
+            countRandom++;  //tăn)g số lần đềm random
         }while(CheckMaPhong(maPhong)==false);
         return maPhong;
         

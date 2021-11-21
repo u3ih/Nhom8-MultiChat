@@ -22,7 +22,7 @@ public class UserDAO {
     private static final String SELECT_ALL_USER = "select * from user";
     private static final String DELETE_USER_SQL = "delete from user where id = ?;";
     private static final String UPDATE_USER_SQL = "update user set firstName = ?,midName = ?,lastName  =  ?,birthDay = ?,age = ?,gender = ? where  id =  ?;";
- 
+    private static final String LOGIN = "SELECT id,firstName,midName,lastName,birthDay,age,gender,isOnline,img from user where username =? and password = ?";
    
     public UserDAO() {
     }
@@ -121,6 +121,44 @@ public class UserDAO {
             System.out.println(e);
         }
         return users;
+    }
+    
+    public User Login(String username, String password) {
+    	User user = new User();
+    	try (Connection connection = getConnection();
+    			PreparedStatement preparedStatement = connection.prepareStatement(LOGIN)){
+    		preparedStatement.setString(1, username);
+    		preparedStatement.setString(2, password);
+    		ResultSet rs = preparedStatement.executeQuery();
+    		
+    		if(rs.wasNull() == false) {
+    			while(rs.next()) {
+        			int id = rs.getInt("id");
+                    String firstName = rs.getString("firstName");
+                    String midName = rs.getString("midName");
+                    String lastName = rs.getString("lastName");
+                    String birthDay = rs.getString("birthDay");
+                    int age = rs.getInt("age");
+                    String gender = rs.getString("gender");
+                    boolean isOnline = rs.getBoolean("isOnline");
+                    String img = rs.getString("img");
+                    user.setId(id);
+                    user.setFirstName(firstName);
+                    user.setMidName(midName);
+                    user.setLastName(lastName);
+                    user.setBirthDay(birthDay);
+                    user.setAge(age);
+                    user.setGender(gender);
+                    
+        		}
+    		}
+    		else return null;
+    		
+    		
+    	}catch (Exception e) {
+			System.out.println(e);
+		}
+    	return user;
     }
 
     public boolean deleteUser(int id) throws SQLException {

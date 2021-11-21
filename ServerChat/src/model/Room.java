@@ -6,13 +6,16 @@
 package model;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Room {
     private String idRoom;
     private String nameRoom;
     private int countPeople;
+    private ArrayList<Message> listMess = new ArrayList<>();
     
     private ArrayList<User> mListUser = new ArrayList<>();
+
 
 	public String getIdRoom() {
 		return idRoom;
@@ -64,10 +67,24 @@ public class Room {
     public void SendToAllUser(String sender, String content)
     {
         int size = mListUser.size();
+        //System.out.println(listMess.size() + "\n");
         for (int i = 0; i < size; i++) 
         {
             User user = mListUser.get(i);
-            if(user.Send(ActionType.SEND_MESSAGE, ResultCode.OK, sender + ";" + content)==false)
+            if(user.Send(ActionType.SEND_MESSAGE, ResultCode.OK, sender +";"+ content)==false)
+            {
+                NotifyJustLeaveRoom(user);
+            }
+        }
+    }
+    
+    public void SendFileToAllUser(String sender, DataFile file, String username)
+    {
+        int size = mListUser.size();
+        for (int i = 0; i < size; i++) 
+        {
+            User user = mListUser.get(i);
+            if(user.SendFile(ActionType.SEND_FILE, ResultCode.OK, sender + ";"+username+";", file)==false)
             {
                 NotifyJustLeaveRoom(user);
             }
@@ -111,5 +128,13 @@ public class Room {
             }
         }
     }
+
+	public ArrayList<Message> getListMess() {
+		return listMess;
+	}
+
+	public void addMess(String sender, String content) {
+		listMess.add(new Message(sender, content));
+	}
 }
 

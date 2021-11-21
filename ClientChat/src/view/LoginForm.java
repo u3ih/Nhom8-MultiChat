@@ -14,6 +14,7 @@ import java.util.logging.Level;
 import controller.ClientManager;
 import model.Result;
 import model.ResultCode;
+import model.ResultObj;
 import model.User;
 import model.ActionType;
 
@@ -143,15 +144,15 @@ public class LoginForm extends javax.swing.JFrame implements Observer {
     @Override
     public void update(Observable o, Object arg) {
     	loginBtn.setEnabled(true);
-        Result result = (Result)arg;
+    	Result result = (Result)arg;
         if(result.mResultCode.equals(ResultCode.ERROR))
         {
             JOptionPane.showMessageDialog(null, result.mContent, "Thất bại", JOptionPane.ERROR_MESSAGE);
         }else if(result.mActionType.equals(ActionType.LOGIN))
         {
-            mClientManager.deleteObserver(this);   //xóa obs login đi để tránh login nhận thông báo trong khi ko hoạt động
-            ListRoom listRoom = new ListRoom(this, mClientManager);
-            listRoom.setVisible(true);
+            mClientManager.deleteObserver(this);   //xóa obs login đi để tránh login nhận thông báo trong khi ko hoạt động;
+            ListForm listForm = new ListForm(mClientManager, this);
+            listForm.setVisible(true);
             this.setVisible(false);
         }
     }

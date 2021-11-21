@@ -22,6 +22,7 @@ public class ListRoom extends javax.swing.JFrame implements Observer{
         mLogin = login;
         mClientManager = clientManager;
         mClientManager.addObserver(this);
+        clientManager.GetListRoom();
     }
     
     public void FillListRoom(Result result)

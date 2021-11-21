@@ -107,7 +107,7 @@ public class RoomChat extends javax.swing.JFrame implements Observer {
         // TODO add your handling code here:
         if(txtMessToSend.getText().trim().length()==0)
             return;
-        mClientManager.SendMess(txtMessToSend.getText().trim());
+       // mClientManager.SendMess(txtMessToSend.getText().trim());
         txtMessToSend.setText("");
     }//GEN-LAST:event_btnSendActionPerformed
 

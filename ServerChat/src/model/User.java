@@ -10,8 +10,13 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -35,22 +40,24 @@ public class User {
     private BufferedReader mBufferReader;
     private DataOutputStream mDataOutputStream;
     private DataInputStream mDataInputStream;
-    private Room mRoom;
-    private Date mTimeConnect; //thời gian kết nối đến server
+    private ObjectOutputStream mObjectOutputStream;
+    private ObjectInputStream mObjectInputStream;
+    private HashMap<String, Room> mRoom = new HashMap<String,Room>();
+    private List<Room> listRoom = new ArrayList<Room>();
+    private Date mTimeConnect; //thá»�i gian káº¿t ná»‘i Ä‘áº¿n server
 
     public User() {
     }
     
     public void setUser(User user) {
+    	this.id = user.id;
     	this.firstName = user.firstName;
         this.midName = user.midName;
         this.lastName = user.lastName;
         this.birthDay = user.birthDay;
         this.age = user.age;
         this.gender = user.gender;
-        this.isOnline = user.isOnline;
         this.username = user.username;
-        this.password = user.password;
     }
 
     public User(String firstName, String midName, String lastName, String birthDay, int age, String gender, boolean isOnline, String username, String password) {
@@ -209,12 +216,22 @@ public class User {
 		this.mDataInputStream = mDataInputStream;
 	}
 
-	public Room getmRoom() {
+	public HashMap<String,Room> getmRoom() {
 		return mRoom;
 	}
 
-	public void setmRoom(Room mRoom) {
+	public void setmRoom(HashMap<String,Room> mRoom) {
 		this.mRoom = mRoom;
+	}
+	
+	public void addRoom(String idRoom,Room room) {
+		mRoom.put(idRoom, room);
+		listRoom.add(room);
+	}
+	
+	public Room getRoom(String idRoom) {
+		Room room = mRoom.get(idRoom);
+		return room;
 	}
 
 	public Date getmTimeConnect() {
@@ -230,7 +247,9 @@ public class User {
         mSocket = socket;
         mBufferReader = new BufferedReader(new InputStreamReader(mSocket.getInputStream(), "UTF8"));
         mDataInputStream = new DataInputStream(mSocket.getInputStream());
-        mDataOutputStream = new DataOutputStream(mSocket.getOutputStream());  //user nhận bằng DataInputStream nên gửi về bằng DataOutputStream
+        mDataOutputStream = new DataOutputStream(mSocket.getOutputStream());  //user nháº­n báº±ng DataInputStream nÃªn gá»­i vá»� báº±ng DataOutputStream
+        mObjectOutputStream = new ObjectOutputStream(mSocket.getOutputStream());
+        mObjectInputStream = new ObjectInputStream(mSocket.getInputStream());
     }
     
     public String Read() throws IOException
@@ -239,6 +258,18 @@ public class User {
         {
             return mBufferReader.readLine();
         }
+        return null;
+    }
+    
+    public DataFile ReadFile() throws IOException
+    {
+    	try {
+			return (DataFile) mObjectInputStream.readObject();
+		} catch (ClassNotFoundException | IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	
         return null;
     }
     
@@ -252,6 +283,19 @@ public class User {
         try 
         {
             mDataOutputStream.writeUTF(actionType + ";" + resultCode + ";" + content);
+            return true;
+        } catch (IOException ex) {
+            Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        }
+    }
+    
+    public Boolean SendFile(String actionType, String resultCode, String content, DataFile file)
+    {
+        try 
+        {
+            mDataOutputStream.writeUTF(actionType + ";" + resultCode + ";" + content);
+            mObjectOutputStream.writeObject(file);
             return true;
         } catch (IOException ex) {
             Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
@@ -273,4 +317,12 @@ public class User {
    public String getFullName() {
 	   return this.firstName +" "+ this.midName + " " + this.lastName; 
    }
+
+public List<Room> getListRoom() {
+	return listRoom;
+}
+
+public void setListRoom(List<Room> listRoom) {
+	this.listRoom = listRoom;
+}
 }

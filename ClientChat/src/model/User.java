@@ -30,6 +30,10 @@ public class User {
 
     public User() {
     }
+    
+    public User(String lastName) {
+    	this.lastName = lastName;
+    }
 
     public User(String firstName, String midName, String lastName, String birthDay, int age, String gender, boolean isOnline, String username, String password) {
         this.firstName = firstName;

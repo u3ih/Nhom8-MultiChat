@@ -6,13 +6,29 @@
 package model;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Room {
     private String idRoom;
     private String nameRoom;
     private int countPeople;
+    private List<Message> listMess = new ArrayList<>();
     
     private ArrayList<User> mListUser = new ArrayList<>();
+    
+    public Room(String idRoom, String nameRoom, int countPeople, ArrayList<User> mlistUser) {
+    	this.idRoom = idRoom;
+    	this.nameRoom = nameRoom;
+    	this.countPeople = countPeople;
+    	this.mListUser = mlistUser;
+    }
+    
+    public Room(String idRoom, String nameRoom, int countPeople) {
+    	this.nameRoom = nameRoom;
+    	this.countPeople = countPeople;
+    	this.idRoom = idRoom;
+    }
+
 
 	public String getIdRoom() {
 		return idRoom;

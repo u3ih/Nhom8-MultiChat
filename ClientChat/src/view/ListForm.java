@@ -1,24 +1,53 @@
 package view;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.GroupLayout.Alignment;
+
+import java.awt.event.WindowListener;
+import java.util.HashMap;
+import java.util.Observable;
+import java.util.Observer;
+
+import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JTabbedPane;
 import javax.swing.JPanel;
 import javax.swing.event.AncestorListener;
+import javax.swing.table.DefaultTableModel;
+
+import controller.ClientManager;
+import model.ActionType;
+import model.Result;
+import model.ResultCode;
+import model.Room;
+import model.ThreadNewRoom;
+
 import javax.swing.event.AncestorEvent;
 
 /**
  *
  * @author ADMIN
  */
-public class ListForm extends javax.swing.JFrame {
+public class ListForm extends javax.swing.JFrame implements Observer {
 
     /**
      * Creates new form ListForm
      */
-    public ListForm() {
+	 ClientManager mclientManager;
+	 LoginForm loginForm;
+	 private String createNameRoom = "";
+	 private String findIDRoom = "";
+	 private HashMap<String,ThreadNewRoom> listThread = new HashMap<String,ThreadNewRoom>();
+	 private RoomListForm r;
+	 
+	
+    public ListForm(ClientManager clientManager,LoginForm loginForm) {
         initComponents();
+        this.mclientManager = clientManager;
+        this.loginForm = loginForm;
+        clientManager.addObserver(this);
+        
     }
 
     /**
@@ -38,7 +67,13 @@ public class ListForm extends javax.swing.JFrame {
 
         jButton2.setText("jButton2");
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            
+            public void windowOpened(java.awt.event.WindowEvent evt) {
+            	mclientManager.GetListRoom();
+            }
+        });
 
         jButton1.setText("Thêm bạn");
 
@@ -54,19 +89,52 @@ public class ListForm extends javax.swing.JFrame {
         
         JButton findRoom = new JButton("Tìm phòng chat");
         
-        JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-        tabbedPane.addAncestorListener(new AncestorListener() {
-        	public void ancestorAdded(AncestorEvent event) {
-        		FriendListForm p=new FriendListForm();
-                tabbedPane.add(p,"danh sách bạn");
-                RoomListForm r=new RoomListForm();
-                tabbedPane.add(r,"danh sách phòng");
-        	}
-        	public void ancestorMoved(AncestorEvent event) {
-        	}
-        	public void ancestorRemoved(AncestorEvent event) {
-        	}
+        createRoom.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            	String s = (String)JOptionPane.showInputDialog(getContentPane(),"Nhap ten phong","Tao phong moi",JOptionPane.PLAIN_MESSAGE);
+            	createNameRoom = s;
+            	mclientManager.CreateRoom(s);
+            }
         });
+        
+        findRoom.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            	String s = (String)JOptionPane.showInputDialog(getContentPane(),"Nhap id phong","Tim phong chat",JOptionPane.PLAIN_MESSAGE);
+            	findIDRoom = s;
+            	mclientManager.JoinRoom(s);
+            }
+        });
+        
+        
+        
+        
+        
+        
+        tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+        
+        tabbedPane.addAncestorListener(new AncestorListener() {
+			
+			@Override
+			public void ancestorRemoved(AncestorEvent event) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void ancestorMoved(AncestorEvent event) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void ancestorAdded(AncestorEvent event) {
+				FriendListForm p=new FriendListForm();
+                tabbedPane.add(p,"danh sách bạn");
+                r= new RoomListForm(mclientManager);
+                tabbedPane.add(r,"danh sách phòng");
+				
+			}
+		});
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         layout.setHorizontalGroup(
@@ -119,6 +187,8 @@ public class ListForm extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
     
+    
+    
     /**
      * @param args the command line arguments
      */
@@ -144,14 +214,8 @@ public class ListForm extends javax.swing.JFrame {
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(ListForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
-        //</editor-fold>
 
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new ListForm().setVisible(true);
-            }
-        });
+        
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -160,4 +224,46 @@ public class ListForm extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel6;
+    private JTabbedPane tabbedPane;
+    
+    
+    
+	@Override
+	public void update(Observable o, Object arg) {
+
+        Result result = (Result)arg;
+        if(result.mResultCode.equals(ResultCode.ERROR))
+        {
+            JOptionPane.showMessageDialog(null, result.mContent, "Thất bại", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        switch (result.mActionType)
+        {
+            case ActionType.CREATE_ROOM:
+            {
+            	String[] lines = result.mContent.split(";", -1);
+                ThreadNewRoom newThreadRoom = new ThreadNewRoom(new ChatGroupForm(mclientManager,lines[0],createNameRoom,1 ));
+                newThreadRoom.run();;
+                listThread.put(lines[0], newThreadRoom);
+                r.setListModel(new Room(lines[0],createNameRoom,1));
+                break;
+            }
+            case ActionType.JOIN_ROOM:
+            {
+            	String[] lines = result.mContent.split(";", -1);
+            	if(listThread.containsKey(findIDRoom)) listThread.remove(findIDRoom);
+                ThreadNewRoom newThreadRoom = new ThreadNewRoom(new ChatGroupForm(mclientManager,findIDRoom,lines[0],Integer.parseInt(lines[1]) ));
+                newThreadRoom.run();
+                mclientManager.getMess(findIDRoom);
+                r.setListModel(new Room(findIDRoom,lines[0],Integer.parseInt(lines[1])));
+                break;
+           }
+            case ActionType.Close_WINDOW_CHAT:
+            {
+            	if (listThread.containsKey(result.mContent)) listThread.remove(result.mContent);
+            }
+        }   
+	}
+
+	
 }
