@@ -56,19 +56,25 @@ public class ClientManager extends Observable{
         if(mThread!=null)
             mThread.stop();
     }
+    private void getConnect() {
+    	try {
+			mSocket = new Socket(serverName, port);
+			mDataInputStream = new DataInputStream(mSocket.getInputStream());
+	        mDataOutputStream = new DataOutputStream(mSocket.getOutputStream());
+	        mObjectOutputStream = new ObjectOutputStream(mSocket.getOutputStream());
+	        mObjectInputStream = new ObjectInputStream(mSocket.getInputStream());
+	        mBufferWriter = new BufferedWriter(new OutputStreamWriter(mSocket.getOutputStream(), "UTF8"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+        
+    }
     public boolean StartConnect(String nickName, String pass)
     {
         try 
         {
-            mSocket = new Socket(serverName, port); 
-            //Sá»­ dá»¥ng dataInputStream Ä‘á»ƒ Ä‘á»£i nháº­n káº¿t quáº£ thÃ¬ vÃ²ng while sáº½ ko cáº§n cháº¡y liÃªn tá»¥c -> trÃ¡nh tá»‘n hiá»‡u suáº¥t
-//            objectInputStream = new ObjectInputStream(mSocket.getInputStream());
-//            objectOutputStream = new ObjectOutputStream(mSocket.getOutputStream());
-            mDataInputStream = new DataInputStream(mSocket.getInputStream());
-            mDataOutputStream = new DataOutputStream(mSocket.getOutputStream());
-            mObjectOutputStream = new ObjectOutputStream(mSocket.getOutputStream());
-            mObjectInputStream = new ObjectInputStream(mSocket.getInputStream());
-            mBufferWriter = new BufferedWriter(new OutputStreamWriter(mSocket.getOutputStream(), "UTF8"));
+        	getConnect();
             mDataOutputStream.writeUTF(nickName);
             mDataOutputStream.writeUTF(pass);
             String res = mDataInputStream.readUTF();
@@ -176,6 +182,39 @@ public class ClientManager extends Observable{
             notifyObservers(result);
         }
     }
+
+    public boolean Register(String Fname,String Mname,String Lname,String Birday,int Age,String Uname,String Pass,String gender) {
+        try
+        {
+        	getConnect();
+            
+        	mDataOutputStream.writeUTF(ActionType.REGISTER);
+        	mDataOutputStream.writeUTF(Fname);
+        	mDataOutputStream.writeUTF(Mname);
+        	mDataOutputStream.writeUTF( Lname);
+        	mDataOutputStream.writeUTF(Birday);
+        	mDataOutputStream.writeInt(Age);
+        	mDataOutputStream.writeUTF(Uname);
+        	mDataOutputStream.writeUTF(Pass);
+        	mDataOutputStream.writeUTF(gender);
+        	
+        	String res = mDataInputStream.readUTF();
+        	System.out.println(res);
+            if(res.equals("ERROR")) {
+            	Result result = new Result("", ResultCode.ERROR, "Lỗi đăng ký");
+                notifyObservers(result);
+                return false;
+            } else if(res.equals("OK")) {
+            	Result result = new Result("", ResultCode.OK, "Đăng ký thành công");
+                notifyObservers(result);
+                return true;
+            }
+        } catch (IOException ex) {
+            Result result = new Result("", ResultCode.ERROR, "Không thể kết nối tới server");
+            notifyObservers(result);
+        }
+		return false;
+	}
     
     public void getMess(String roomID) {
     	String line = ActionType.GET_MESS + ";" + roomID;
@@ -187,6 +226,19 @@ public class ClientManager extends Observable{
             Result result = new Result("", ResultCode.ERROR, "KhÃ´ng thá»ƒ káº¿t ná»‘i tá»›i server");
             notifyObservers(result);
         }
+    }
+
+    public boolean isSuccessReg(){
+    	String s="OK";
+    	String result;
+		try {
+			result = mDataInputStream.readUTF();
+			return s.equals(result);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	return false;
     }
     
     public void GetListRoom()

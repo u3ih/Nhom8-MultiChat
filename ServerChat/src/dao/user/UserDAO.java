@@ -17,7 +17,7 @@ public class UserDAO {
     private String jdbcURL = "jdbc:mysql://localhost:3306/chat";
     private String jdbcUsername = "root";
     private String jdbcPassword = "root";
-    private static final String INSERT_USER_SQL = "INSERT INTO user" + " (firstName,midName,lastName,birthDay,age,gender) VALUES " +" (?, ?, ?, ?, ?, ?);";
+    private static final String INSERT_USER_SQL = "INSERT INTO user" + " (firstName,midName,lastName,birthDay,age,gender,isOnline,username,password, img) VALUES " +" (?, ?, ?, ?, ?, ?, ?,?,?, ?);";
     private static final String SELECT_USER_BY_ID = "select id,firstName,midName,lastName,birthDay,age,gender from user where id =  ?";
     private static final String SELECT_ALL_USER = "select * from user";
     private static final String DELETE_USER_SQL = "delete from user where id = ?;";
@@ -53,9 +53,10 @@ public class UserDAO {
             preparedStatement.setString(4, user.getBirthDay());
             preparedStatement.setInt(5, user.getAge());
             preparedStatement.setString(6, user.isGender());
-            //preparedStatement.setBoolean(7, user.isIsOnline());
-            //preparedStatement.setString(8, user.getUsername());
-            //preparedStatement.setString(9, user.getPassword());
+            preparedStatement.setInt(7, 0);
+            preparedStatement.setString(8, user.getUsername());
+            preparedStatement.setString(9, user.getPassword());
+            preparedStatement.setString(10, "/Image/10207-man-student-light-skin-tone-icon-32.png");
             System.out.println(preparedStatement);
             preparedStatement.executeUpdate();
         } catch (SQLException e) {

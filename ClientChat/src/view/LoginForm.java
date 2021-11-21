@@ -3,6 +3,7 @@ import java.awt.event.ActionListener;
 import java.io.UnsupportedEncodingException;
 import java.util.logging.Logger;
 
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import java.util.ArrayList;
@@ -65,7 +66,7 @@ public class LoginForm extends javax.swing.JFrame implements Observer {
         jLabel3.setText("Password");
 
         loginBtn.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
-        loginBtn.setText("Login");
+        loginBtn.setText("Đăng nhập");
         loginBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonLoginPerformed(evt);
@@ -73,7 +74,12 @@ public class LoginForm extends javax.swing.JFrame implements Observer {
         });
 
         registerBtn.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
-        registerBtn.setText("Register");
+        registerBtn.setText("Đăng ký");
+        registerBtn.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		btnRegisterActionPerformed(e);
+        	}
+        });
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         jLabel1.setText("Chat App");
@@ -167,12 +173,6 @@ public class LoginForm extends javax.swing.JFrame implements Observer {
             return;
         }
         
-//        if(!accept) {
-//        	JOptionPane.showMessageDialog(null, "Sai tài khoản hoặc mật khẩu", "thông tin sai", JOptionPane.WARNING_MESSAGE);
-//        	txtNickName.requestFocus();
-//            txtPassword.requestFocus();
-//            return;
-//        }
         
     	if(mClientManager!=null)
         {
@@ -194,6 +194,17 @@ public class LoginForm extends javax.swing.JFrame implements Observer {
     /**
      * @param args the command line arguments
      */
+
+    private void btnRegisterActionPerformed(ActionEvent e) {
+		// TODO Auto-generated method stub
+    	RegisterForm mRegis=new RegisterForm();
+    	mRegis.setVisible(true);
+    	mRegis.pack();
+    	mRegis.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    	mRegis.setLocationRelativeTo(null);
+        this.dispose();
+	}
+
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">

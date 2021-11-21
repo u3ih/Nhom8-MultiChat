@@ -4,6 +4,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -90,7 +91,28 @@ public class ServerManager extends Observable
                         User newUser = new User(socket);
                         mDataInputStream = new DataInputStream(socket.getInputStream());
                         mDataOutputStream = new DataOutputStream(socket.getOutputStream());
-                        String nickName = mDataInputStream.readUTF();
+                        String req = mDataInputStream.readUTF();
+                        if(req.equals(ActionType.REGISTER) ) {
+                        	try {
+            					String Fname=mDataInputStream.readUTF();
+            					String Mname=mDataInputStream.readUTF();
+            					String Lname=mDataInputStream.readUTF();
+            					String Birday=mDataInputStream.readUTF();
+            					int Age=mDataInputStream.readInt();
+            					String Uname=mDataInputStream.readUTF();
+            					String Pass=mDataInputStream.readUTF();
+            					String gender=mDataInputStream.readUTF();
+            					User uss= new User(Fname,Mname,Lname,Birday,Age,gender,true,Uname,Pass);
+            					//System.out.println(uss.toString());
+            					UserDAO ud = new UserDAO();
+            					ud.insertUser(uss);
+            					mDataOutputStream.writeUTF("OK");
+            				} catch (IOException | SQLException e) {
+            					mDataOutputStream.writeUTF("ERROR");
+            				} 
+                        	continue;
+                        }
+                        String nickName = req;
                         String pass = mDataInputStream.readUTF();
                         
                         if(mListUser.containsKey(nickName)) {
@@ -109,7 +131,6 @@ public class ServerManager extends Observable
                         	socket.close();
                         	continue;
                         }
-
                         
                         mListUserOnline.add(newUser);
                         System.out.println(mListUserOnline);

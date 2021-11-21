@@ -16,4 +16,5 @@ public class ActionType {
     public static final String Close_WINDOW_CHAT = "12";
     public static final String GET_MESS = "13";
     public static final String SEND_FILE = "14";
+    public static final String REGISTER="15";
 }
