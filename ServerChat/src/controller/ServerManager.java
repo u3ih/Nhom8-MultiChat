@@ -106,6 +106,7 @@ public class ServerManager extends Observable
             					//System.out.println(uss.toString());
             					UserDAO ud = new UserDAO();
             					ud.insertUser(uss);
+            					mListUser.put(uss.getUsername(), uss);
             					mDataOutputStream.writeUTF("OK");
             				} catch (IOException | SQLException e) {
             					mDataOutputStream.writeUTF("ERROR");

@@ -199,7 +199,6 @@ public class ClientManager extends Observable{
         	mDataOutputStream.writeUTF(gender);
         	
         	String res = mDataInputStream.readUTF();
-        	System.out.println(res);
             if(res.equals("ERROR")) {
             	Result result = new Result("", ResultCode.ERROR, "Lỗi đăng ký");
                 notifyObservers(result);
