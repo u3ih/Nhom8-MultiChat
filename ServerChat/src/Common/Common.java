@@ -12,5 +12,5 @@ package Common;
 public class Common {
     public static final String jdbcUrl = "jdbc:mysql://localhost:3306/chat";
     public static final String jdbcUsername = "root";
-    public static final String jdbcPassword = "Hungblo123";
+    public static final String jdbcPassword = "root";
 }

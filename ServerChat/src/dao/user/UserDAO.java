@@ -6,6 +6,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
+
+import Common.Common;
 import model.User;
 
 /**
@@ -14,9 +16,9 @@ import model.User;
  */
 public class UserDAO {
 
-    private String jdbcURL = "jdbc:mysql://localhost:3306/chat";
-    private String jdbcUsername = "root";
-    private String jdbcPassword = "root";
+    private String jdbcURL = Common.jdbcUrl;
+    private String jdbcUsername = Common.jdbcUsername;
+    private String jdbcPassword = Common.jdbcPassword;
     private static final String INSERT_USER_SQL = "INSERT INTO user" + " (firstName,midName,lastName,birthDay,age,gender,isOnline,username,password, img) VALUES " +" (?, ?, ?, ?, ?, ?, ?,?,?, ?);";
     private static final String SELECT_USER_BY_ID = "select id,firstName,midName,lastName,birthDay,age,gender from user where id =  ?";
     private static final String SELECT_ALL_USER = "select * from user";

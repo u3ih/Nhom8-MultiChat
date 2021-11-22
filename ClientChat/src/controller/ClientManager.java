@@ -79,7 +79,7 @@ public class ClientManager extends Observable{
             mDataOutputStream.writeUTF(pass);
             String res = mDataInputStream.readUTF();
             if(res.equals("ERROR")) {
-            	Result result = new Result("", ResultCode.ERROR, "Sai tÃ i khoáº£n hoáº·c máº­t kháº©u");
+            	Result result = new Result("", ResultCode.ERROR, "Sai tài khoản hoặc mật khẩu");
                 notifyObservers(result);
                 return false;
             }
@@ -87,7 +87,7 @@ public class ClientManager extends Observable{
             return true;
         } catch (IOException ex) 
         {
-            Result result = new Result("", ResultCode.ERROR, "KhÃ´ng thá»ƒ káº¿t ná»‘i Ä‘áº¿n server");
+            Result result = new Result("", ResultCode.ERROR, "Không thể kết nối tới server");
             notifyObservers(result);
             return false;
         }
@@ -149,7 +149,7 @@ public class ClientManager extends Observable{
             mBufferWriter.write(line + "\n");
             mBufferWriter.flush();
         } catch (IOException ex) {
-            Result result = new Result("", ResultCode.ERROR, "KhÃ´ng thá»ƒ káº¿t ná»‘i tá»›i server");
+            Result result = new Result("", ResultCode.ERROR, "Không thể kết nối tới server");
             notifyObservers(result);
         }
     }
@@ -222,7 +222,7 @@ public class ClientManager extends Observable{
             mBufferWriter.write(line + "\n");
             mBufferWriter.flush();
         } catch (IOException ex) {
-            Result result = new Result("", ResultCode.ERROR, "KhÃ´ng thá»ƒ káº¿t ná»‘i tá»›i server");
+            Result result = new Result("", ResultCode.ERROR, "Không thể kết nối tới server");
             notifyObservers(result);
         }
     }
@@ -248,7 +248,7 @@ public class ClientManager extends Observable{
             mBufferWriter.write(line + "\n");
             mBufferWriter.flush();
         } catch (IOException ex) {
-            Result result = new Result("", ResultCode.ERROR, "Káº¿t ná»‘i tá»›i server cÃ³ lá»—i");
+            Result result = new Result("", ResultCode.ERROR, "Không thể kết nối tới server");
             notifyObservers(result);
         }
     }
@@ -259,7 +259,7 @@ public class ClientManager extends Observable{
     		mBufferWriter.write(line + "\n");
             mBufferWriter.flush();
 		} catch (Exception e) {
-			Result result = new Result("", ResultCode.ERROR, "Káº¿t ná»‘i tá»›i server cÃ³ lá»—i");
+			Result result = new Result("", ResultCode.ERROR, "Không thể kết nối tới server");
             notifyObservers(result);
 		}
     }
@@ -272,7 +272,7 @@ public class ClientManager extends Observable{
             mBufferWriter.write(line + "\n");
             mBufferWriter.flush();
         } catch (IOException ex) {
-            Result result = new Result("", ResultCode.ERROR, "Káº¿t ná»‘i tá»›i server cÃ³ lá»—i");
+            Result result = new Result("", ResultCode.ERROR, "Không thể kết nối tới server");
             notifyObservers(result);
         }
     }
@@ -285,7 +285,7 @@ public class ClientManager extends Observable{
             mBufferWriter.write(line + "\n");
             mBufferWriter.flush();
         } catch (IOException ex) {
-            Result result = new Result("", ResultCode.ERROR, "Káº¿t ná»‘i tá»›i server cÃ³ lá»—i");
+            Result result = new Result("", ResultCode.ERROR, "Không thể kết nối tới server");
             notifyObservers(result);
         }
     }
@@ -297,7 +297,7 @@ public class ClientManager extends Observable{
             mBufferWriter.write(line + "\n");
             mBufferWriter.flush();
         } catch (IOException ex) {
-            Result result = new Result("", ResultCode.ERROR, "Káº¿t ná»‘i tá»›i server cÃ³ lá»—i");
+            Result result = new Result("", ResultCode.ERROR, "Không thể kết nối tới server");
             notifyObservers(result);
         }
     }
@@ -312,7 +312,7 @@ public class ClientManager extends Observable{
             mBufferWriter.write(line + "\n");
             mBufferWriter.flush();
         } catch (IOException ex) {
-            Result result = new Result("", ResultCode.ERROR, "Káº¿t ná»‘i tá»›i server cÃ³ lá»—i");
+            Result result = new Result("", ResultCode.ERROR, "Không thể kết nối tới server");
             notifyObservers(result);
         }
     }

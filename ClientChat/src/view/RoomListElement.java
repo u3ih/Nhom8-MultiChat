@@ -112,7 +112,7 @@ public class RoomListElement extends javax.swing.JPanel implements ListCellRende
 	public Component getListCellRendererComponent(JList<? extends Room> list, Room value, int index, boolean isSelected,
 			boolean cellHasFocus) {
 		this.jLabel2.setText(value.getNameRoom());
-		this.jLabel3.setText("jhiugrg");
+		this.jLabel3.setText("");
 		return this;
 	}
 	

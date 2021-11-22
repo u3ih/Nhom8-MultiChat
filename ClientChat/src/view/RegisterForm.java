@@ -111,14 +111,14 @@ public class RegisterForm extends javax.swing.JFrame implements Observer{
         jLabel5.setText("Gi\u1EDBi t\u00EDnh");
 
         jLabel6.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
-        jLabel6.setText("Tuổi");
+        jLabel6.setText("Tu\u1ED5i");
 
         buttonGroup1.add(jCheckBox1);
         jCheckBox1.setSelected(true);
         jCheckBox1.setText("Nam");
 
         buttonGroup1.add(jCheckBox2);
-        jCheckBox2.setText("Nữ¯");
+        jCheckBox2.setText("N\u1EEF");
 
         jLabel7.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
         jLabel7.setText("H\u1ECD");

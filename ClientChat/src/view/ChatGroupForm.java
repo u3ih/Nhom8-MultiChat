@@ -126,9 +126,9 @@ public class ChatGroupForm extends javax.swing.JFrame implements Observer{
 
         btnSendFile.setText("Chuyển file");
 
-        jLabel1.setText("ThÃ nh viÃªn room");
+        jLabel1.setText("Thành viên room");
         
-        btnSendGroup = new JButton("Gá»­i");
+        btnSendGroup = new JButton("Gửi");
         btnSendGroup.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
         		String mess = jTextField2.getText().trim();
