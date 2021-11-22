@@ -15,7 +15,6 @@ import java.util.logging.Level;
 import controller.ClientManager;
 import model.Result;
 import model.ResultCode;
-import model.ResultObj;
 import model.User;
 import model.ActionType;
 

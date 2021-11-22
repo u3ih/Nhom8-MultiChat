@@ -12,7 +12,7 @@ public class Room {
     private String idRoom;
     private String nameRoom;
     private int countPeople;
-    private List<Message> listMess = new ArrayList<>();
+    private List<MessageRoom> listMess = new ArrayList<>();
     
     private ArrayList<User> mListUser = new ArrayList<>();
     

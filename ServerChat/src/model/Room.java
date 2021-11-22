@@ -12,7 +12,7 @@ public class Room {
     private String idRoom;
     private String nameRoom;
     private int countPeople;
-    private ArrayList<Message> listMess = new ArrayList<>();
+    private ArrayList<MessageRoom> listMess = new ArrayList<>();
     
     private ArrayList<User> mListUser = new ArrayList<>();
 
@@ -52,11 +52,13 @@ public class Room {
 	public void AddUser(User user)
     {
         mListUser.add(user);
+        countPeople++;
     }
     
     public void RemoveUser(User user)
     {
         mListUser.remove(user);
+        countPeople--;
     }
     
     public int CountUser()
@@ -112,7 +114,7 @@ public class Room {
             User user = mListUser.get(i);
             if(user!=userJoin)
             {
-                user.Send(ActionType.NOTIFY_JUST_JOIN_ROOM, ResultCode.OK, userJoin.getLastName());
+                user.Send(ActionType.NOTIFY_JUST_JOIN_ROOM, ResultCode.OK,idRoom +";"+ userJoin.getLastName());
             }
         }
     }
@@ -129,12 +131,12 @@ public class Room {
         }
     }
 
-	public ArrayList<Message> getListMess() {
+	public ArrayList<MessageRoom> getListMess() {
 		return listMess;
 	}
 
 	public void addMess(String sender, String content) {
-		listMess.add(new Message(sender, content));
+		listMess.add(new MessageRoom(sender, content));
 	}
 }
 

@@ -53,7 +53,8 @@ public class ChatGroupForm extends javax.swing.JFrame implements Observer{
         this.mTenPhong = mTenPhong;
         this.mSoNguoi = mSoNguoi;
         mClientManager.addObserver(this);
-        //mClientManager.GetRoomMember(mMaPhong);
+        mClientManager.GetRoomMember(mMaPhong);
+        mClientManager.getMess(mMaPhong);
     }
 
    
@@ -268,48 +269,49 @@ Result result = (Result)arg;
         
         if(result.mResultCode.equals(ResultCode.ERROR))
         {
-            JOptionPane.showMessageDialog(null, result.mContent, "Tháº¥t báº¡i", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, result.mContent, "ThÃ¡ÂºÂ¥t bÃ¡ÂºÂ¡i", JOptionPane.ERROR_MESSAGE);
             return;
         }
         switch (result.mActionType)
         {
-            case ActionType.SEND_MESSAGE:
-            {
-                String[] lines = result.mContent.split(";", -1);
-                String sender = lines[0];
-                String messContent = lines[1];
-                //System.out.println(sender +" " + messContent +"\n");
-                messContent = messContent.replaceAll("<br>", "\n");  //khi tin nháº¯n gá»­i Ä‘i Ä‘Ã£ thay kÃ½ tá»± xuá»‘ng dÃ²ng báº±ng <br> nÃªn khi nháº­n vá»� thÃ¬ thay ngÆ°á»£c láº¡i
-                if(sender.equals(mClientManager.mNickname))
-                    txtNoiDungChat.append("Me: " + messContent + "\n");
-                else
-                	txtNoiDungChat.append(sender + ": " + messContent + "\n");
-                break;
-            }
-            case ActionType.GET_MESS:
-        	{
-        		if(result.mContent.length()>0)
-        	    {
-        	        String[] lines = result.mContent.split(";",-1);
-        	        String[] rows = lines[1].split("<row>");
-        	        if(mMaPhong == lines[0]) {
-        	        for (int i = 0; i < rows.length; i++) //hÃ ng Ä‘áº§u lÃ  trá»‘ng
-        	        {
-        	            String[] cols = rows[i].split("<col>");
-        	            
-        	            String sender = cols[0];
-        	            String messContent = cols[1];
-        	            if(sender.equals(mClientManager.mNickname))
-                            txtNoiDungChat.append("Me: " + messContent + "\n");
-  
-                        else
-                        	txtNoiDungChat.append(sender + ": " + messContent + "\n");
-        	            
-        	        }
-        	        }
-        	    }
-        		break;
-        	}
+        case ActionType.SEND_MESSAGE:
+        {
+            String[] lines = result.mContent.split(";", -1);
+            String sender = lines[0];
+            String messContent = lines[1];
+            System.out.println(sender +" " + messContent +"\n");
+            messContent = messContent.replaceAll("<br>", "\n");  //khi tin nhÃ¡ÂºÂ¯n gÃ¡Â»Â­i Ã„â€˜i Ã„â€˜Ä‚Â£ thay kÄ‚Â½ tÃ¡Â»Â± xuÃ¡Â»â€˜ng dÄ‚Â²ng bÃ¡ÂºÂ±ng <br> nÄ‚Âªn khi nhÃ¡ÂºÂ­n vÃ¡Â»ï¿½ thÄ‚Â¬ thay ngÃ†Â°Ã¡Â»Â£c lÃ¡ÂºÂ¡i
+            if(sender.equals(mClientManager.mNickname))
+            	txtNoiDungChat.append("Me: " + messContent + "\n");
+            
+            
+            
+            else
+            	txtNoiDungChat.append(sender + ": " + messContent + "\n");
+            break;
+        }
+        case ActionType.GET_MESS:
+    	{
+    		if(result.mContent.length()>0)
+    	    {
+    	        String[] lines = result.mContent.split(";",-1);
+    	        if(lines[0].equals(mMaPhong)) {
+    	        	String[] rows = lines[1].split("<row>");
+    	        		for (int i = 0; i < rows.length; i++) //hÄ‚Â ng Ã„â€˜Ã¡ÂºÂ§u lÄ‚Â  trÃ¡Â»â€˜ng
+    	        		{
+    	        			String[] cols = rows[i].split("<col>");
+    	            
+    	        			String sender = cols[0];
+    	        			String messContent = cols[1];
+    	        			if(sender.equals(mClientManager.mNickname))
+    	        				txtNoiDungChat.append("Me: " + messContent + "\n");    
+    	        			else
+    	        				txtNoiDungChat.append(sender + ": " + messContent + "\n");
+    	            
+    	        }}
+    	    }
+    		break;
+    	}
             case ActionType.SEND_FILE:
             {
             	String[] lines = result.mContent.split(";", -1);
@@ -324,21 +326,25 @@ Result result = (Result)arg;
                 mod.addElement(result.file);
                 break;
             }
-//            case ActionType.GET_ROOM_MEMBER:
-//        	{
-//        		if(result.mContent.length()>0)
-//        	    {
-//        	        //ds phÃ²ng cÃ³ dáº¡ng maphong<col>tenphong<col>songuoi<col><row>
-//        	        //                 maphong<col>tenphong<col>songuoi<col><row>
-//        	        String[] names = result.mContent.split(";");
-//        	        for (int i = 0; i < names.length; i++) //hÃ ng Ä‘áº§u lÃ  trá»‘ng
-//        	        {
-//        	            jTextArea2.append(names[i] + "\n");
-//        	            
-//        	        }
-//        	    }
-//        		break;
-//        	}
+            case ActionType.GET_ROOM_MEMBER:
+        	{
+        		System.out.println(result.mContent + "\n");
+        		if(result.mContent.length()>0)
+        	    {
+        			String[] lines = result.mContent.split(";",-1);
+        			System.out.println(lines[0]+" ");
+        			if(lines[0].equals(mMaPhong)) {
+        				jTextArea2.setText("");
+        	        for (int i = 1; i < lines.length; i++)
+        	        {
+        	        	System.out.println(lines[i]+" ");
+        	            jTextArea2.append(lines[i] + "\n");
+        	            
+        	        }
+        			}
+        	    }
+        		break;
+        	}
 //            case ActionType.UPDATE_NUMBER_USER:
 //            {
 //                String soNguoi = result.mContent;
@@ -346,12 +352,19 @@ Result result = (Result)arg;
 //                setTitle("ID: " + mMaPhong + " Name: " + mTenPhong + " So nguoi trong phong: " + mSoNguoi);
 //                break;
 //            }
-//            case ActionType.NOTIFY_JUST_JOIN_ROOM:
-//            {
-//                String userJoin = result.mContent;
-//                jTextArea1.append("<" + userJoin + "> vá»«a tham gia phÃ²ng\n" );
-//                break;
-//            }
+           case ActionType.NOTIFY_JUST_JOIN_ROOM:
+            {
+            	String[] lines = result.mContent.split(";", -1);
+            	if(lines[0].equals(mMaPhong)) {
+            		String userJoin = lines[1];
+            		txtNoiDungChat.append("<" + userJoin + "> vừa tham gia phòng\n" );
+            		mSoNguoi ++;
+            		setTitle("ID: " + mMaPhong + " Name: " + mTenPhong + " So nguoi trong phong: " + mSoNguoi);
+            		mClientManager.GetRoomMember(mMaPhong);
+            	}
+//                jTextArea2.append(userJoin + "\n");
+                break;
+            }
         }
 		
 	}

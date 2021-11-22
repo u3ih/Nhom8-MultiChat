@@ -19,7 +19,8 @@ import dao.room.RoomDAO;
 import dao.user.UserDAO;
 import model.ActionType;
 import model.DataFile;
-import model.Message;
+import model.MessageRoom;
+import model.MessageRoom;
 import model.ResultCode;
 import model.Room;
 import model.User;
@@ -38,7 +39,7 @@ public class ServerManager extends Observable
     
     DataInputStream mDataInputStream;
     DataOutputStream mDataOutputStream;
-    RoomDAO dao = new RoomDAO();
+    RoomDAO roomDAO = new RoomDAO();
     
     public ServerManager(Observer obs)  //hàm khởi tạo khi chưa có socket
     {
@@ -258,22 +259,25 @@ public class ServerManager extends Observable
             }
             case ActionType.CREATE_ROOM:
             {
-                String roomName = lines[1];  //query có dạng actionType;roomName
+            	String roomName = lines[1];  //query cÄ‚Â³ dÃ¡ÂºÂ¡ng actionType;roomName
                 Room room = GeneralRoom(roomName);
                 mListRoom.add(room);
                 user.addRoom(room.getIdRoom(), room);
                 if(user.Send(actionType, ResultCode.OK, room.getIdRoom()))
                     room.AddUser(user);
+                roomDAO.createRoom(room.getIdRoom(),1, room.getNameRoom());
+                roomDAO.addRoomConnection(room.getIdRoom(), user.getId());
                 notifyObservers(user.getUsername() + " vừa tạo phòng " + roomName);
                 break;
             }
             case ActionType.GET_LIST_ROOM:
             {
-                List<Room> list = user.getListRoom();//query có dạng actionType;
+                List<Room> list = user.getListRoom();//query cÃ³ dáº¡ng actionType;
                 int size = list.size();
-                int rowsPerBlock = 500;    //số phòng gửi về mỗi block
+                int rowsPerBlock = 500;    //sá»‘ phÃ²ng gá»­i vá»� má»—i block
                 if(size>0)
                 {
+                    
                     String listRoom = "";
                     int start=0;
                     int end=0;
@@ -288,12 +292,12 @@ public class ServerManager extends Observable
                             Room room = list.get(j);
                             listRoom+= room.getIdRoom() + "<col>" + room.getNameRoom() + "<col>" + room.CountUser() + "<col>" + "<row>";
                         }
-                        System.out.print("Gửi lần thứ: " + i);
+                        System.out.print("Gá»­i láº§n thá»©: " + i);
                         user.Send(actionType, ResultCode.OK, listRoom);
                     }
                     
                     listRoom = "";
-                    for (int i = end; i < size; i++) //gửi nốt những phòng còn lại
+                    for (int i = end; i < size; i++) //gá»­i ná»‘t nhá»¯ng phÃ²ng cÃ²n láº¡i
                     {
                         Room room = list.get(i);
                         listRoom+= room.getIdRoom() + "<col>" + room.getNameRoom() + "<col>" + room.CountUser() + "<col>" + "<row>";
@@ -309,8 +313,11 @@ public class ServerManager extends Observable
             case ActionType.GET_MESS:
             {
             	
-                Room room = user.getRoom(lines[1]);//query có dạng actionType;
-                List<Message> list = room.getListMess();
+            	Room room = user.getRoom(lines[1]);//query cÃ³ dáº¡ng actionType;
+                List<MessageRoom> list = roomDAO.getMessByRoomID(room.getIdRoom());
+                for(MessageRoom mess:list) {
+                	System.out.println(mess.getSender() + " " + mess.getMess());
+                }
                 int size = list.size();
                 if(size>0)
                 {
@@ -319,7 +326,7 @@ public class ServerManager extends Observable
                     for (int i = 0; i < size; i++) 
                     {
                         
-                            Message mess = list.get(i);
+                            MessageRoom mess = list.get(i);
                             listMess+= mess.getSender() + "<col>" + mess.getMess() + "<col>" + "<row>";
                         
                         
@@ -331,45 +338,39 @@ public class ServerManager extends Observable
                 {
                     user.Send(actionType, ResultCode.OK, "");
                 }
-                notifyObservers(user.getLastName() + " vừa lấy list tin nhắn");
+                notifyObservers(user.getLastName() + " Vừa lấy danh sách tin nhắn ");
                 break;
             }
-//            case ActionType.GET_ROOM_MEMBER:
-//            {
-//            	
-//                List<User> list = user.getRoom(lines[1]).getmListUser();//query có dạng actionType;
-//                int size = list.size();
-//   //số phòng gửi về mỗi block
-//                if(size>0)
-//                {
-//                    /*Nếu có quá nhiều phòng(2000 chẳng hạn) thì 1 chuỗi string(1 lần gửi) sẽ không
-//                    thể chứa hết được thông tin của tất cả phòng
-//                    nên ta chia ra từng block gửi nhiều lần.
-//                    Trong thực tế thì có thể sử dụng chức năng phân trang, nhưng trong project này
-//                    không phân trang nên lựa chọn cách thức này
-//                    */
-//                    String listMess = "";
-//                    for (int i = 0; i < 21; i++) 
-//                    {
-//                        
-//                            String name = list.get(i).getUsername();
-//                            listMess+= name + ";";
-//                        
-//                        
-//                    }
-//                    user.Send(actionType, ResultCode.OK, listMess);
-//                    
-//                    
-//                }else
-//                {
-//                    user.Send(actionType, ResultCode.OK, "");
-//                }
-//                notifyObservers(user.getLastName() + " vừa lấy danh sách phòng");
-//                break;
-//            }
+            case ActionType.GET_ROOM_MEMBER:
+            {
+            	
+                List<User> list = user.getRoom(lines[1]).getmListUser();//query cÃ³ dáº¡ng actionType;
+                System.out.println(list.size() + "\n");
+                int size = list.size();
+                if(size>0)
+                {
+                    String listMess = "";
+                    for (int i = 0; i < size; i++) 
+                    {
+                        
+                            String name = list.get(i).getUsername();
+                            listMess+= name + ";";
+                        
+                        
+                    }
+                    user.Send(actionType, ResultCode.OK,lines[1] + ";" + listMess);
+                    
+                    
+                }else
+                {
+                    user.Send(actionType, ResultCode.OK, "");
+                }
+                notifyObservers(user.getLastName() + " vừa lấy danh sách thành viên");
+                break;
+            }
             case ActionType.JOIN_ROOM:
             {
-                String maPhong = lines[1];   //query có dạng actionType;maPhong
+                String maPhong = lines[1];   //query cÃ³ dáº¡ng actionType;maPhong
                 int size = mListRoom.size();
                 boolean success = false;
                 for (int i = 0; i < size; i++) 
@@ -377,14 +378,22 @@ public class ServerManager extends Observable
                     Room room = mListRoom.get(i);
                     if(room.getIdRoom().equals(maPhong))
                     {
+                    	if(user.getmRoom().containsKey(room.getIdRoom())) {
+                    		user.Send(actionType, ResultCode.ERROR, "Báº¡n Ä‘Ã£ á»Ÿ trong phÃ²ng");
+                    		return;
+                    	}
+                    	else {
+                    	roomDAO.addRoomConnection(room.getIdRoom(), user.getId());
                         room.AddUser(user);
+                        roomDAO.UpdateMemberCount(room.getIdRoom(), room.getCountPeople());
                         user.addRoom(room.getIdRoom(),room);
                         String count = room.getmListUser().size()+"";
                         user.Send(actionType, ResultCode.OK, room.getNameRoom() + ";" + count);
-                        notifyObservers(user.getUsername() + " vừa tham gia phòng " + room.getIdRoom());
+                        notifyObservers(user.getUsername() + " vá»«a tham gia phÃ²ng " + room.getIdRoom());
                         user.getRoom(room.getIdRoom()).UpdateNumberUser();
                         user.getRoom(room.getIdRoom()).NotifyJustJoinRoom(user);
                         success = true;
+                    	}
                     }
                 }
                 if(success==false)
@@ -397,13 +406,19 @@ public class ServerManager extends Observable
             }
             case ActionType.SEND_MESSAGE:
             {
-            	System.out.println(lines[1] +" " + lines[2]);
+            	
                 String contentMess = "";
                 if(lines.length>=2)
-                    contentMess = lines[2];   //query có dạng actionType;contentMess
+                    contentMess = lines[2];   //query cÃ³ dáº¡ng actionType;contentMess
                 user.getRoom(lines[1]).SendToAllUser(user.getUsername(), contentMess);
-                user.getRoom(lines[1]).addMess(user.getUsername(), contentMess);
-                System.out.println(user.getUsername() + " " + contentMess + "\n");
+                MessageRoom mess = new MessageRoom(user.getUsername(), contentMess);
+                
+                System.out.println("mess: " + mess.getSender() + " " + mess.getMess());
+                
+                //List<MessageRoom> listMessRoom = user.getRoom(lines[1]).getListMess();
+                //System.out.println("MessRoom: "+ listMessRoom.get(0).getSender() + " " + listMessRoom.get(0).getMess() );
+                //System.out.println("MessRoom: ");
+                roomDAO.InsertMess(user.getRoom(lines[1]).getIdRoom(), user.getId(), contentMess);
                 notifyObservers(user.getUsername() + " vừa gửi tin");
                 break;
             }
@@ -453,7 +468,6 @@ public class ServerManager extends Observable
     {
         Room room = new Room();
         room.setNameRoom(roomName);
-        room.setCountPeople(1);
         room.setIdRoom(GeneralMaPhong());
         return room;
     }

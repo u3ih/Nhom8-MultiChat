@@ -1,6 +1,7 @@
 
 package view;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -25,6 +26,8 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
 import controller.ClientManager;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 /**
  *
@@ -40,6 +43,7 @@ public class RoomListForm extends javax.swing.JPanel implements Observer {
 	private DefaultListModel<Room> listRoomModel;
 	private JScrollPane scrollPane;
 	private GroupLayout groupLayout;
+	private HashMap<String,ThreadNewRoom> listThread = new HashMap<String,ThreadNewRoom>();
 	
     public RoomListForm(ClientManager clientManager) {
     	initComponents();
@@ -47,17 +51,17 @@ public class RoomListForm extends javax.swing.JPanel implements Observer {
     	clientManager.addObserver(this);
     	listRoomModel = (DefaultListModel<Room>) list.getModel();
     	
-    	list.addListSelectionListener(new ListSelectionListener() {
-			
-			@Override
-			public void valueChanged(ListSelectionEvent e) {
-				int s = list.getSelectedIndex();
-				Room room = listRoomModel.elementAt(s);
-				ThreadNewRoom newThreadRoom = new ThreadNewRoom(new ChatGroupForm(clientManager,room.getIdRoom(),room.getNameRoom(),room.getCountPeople()));
-                newThreadRoom.run();
-                clientManager.getMess(room.getIdRoom());
-			}
-		});
+//    	list.addListSelectionListener(new ListSelectionListener() {
+//			
+//			@Override
+//			public void valueChanged(ListSelectionEvent e) {
+//				int s = list.getSelectedIndex();
+//				Room room = listRoomModel.elementAt(s);
+//				ThreadNewRoom newThreadRoom = new ThreadNewRoom(new ChatGroupForm(clientManager,room.getIdRoom(),room.getNameRoom(),room.getCountPeople()));
+//                newThreadRoom.run();
+//                clientManager.getMess(room.getIdRoom());
+//			}
+//		});
         
     }
     
@@ -109,6 +113,24 @@ public void initList(Result result) {
     				.addContainerGap())
     	);
     	list = new JList<Room>(new DefaultListModel<Room>());
+    	list.addMouseListener(new MouseAdapter() {
+    		@Override
+    		public void mouseClicked(MouseEvent e) {
+    			int s = list.getSelectedIndex();
+				Room room = listRoomModel.elementAt(s);
+				ThreadNewRoom newThreadRoom = new ThreadNewRoom(new ChatGroupForm(clientManager,room.getIdRoom(),room.getNameRoom(),room.getCountPeople()));
+                if(listThread.containsKey(room.getIdRoom())) {
+                	return;
+                }
+                else {
+                	newThreadRoom.run();				
+                    listThread.put(room.getIdRoom(), newThreadRoom);
+                }
+                
+                list.setSelectedIndex(0);
+    		}
+    	});
+    	
     	list.setCellRenderer(new RoomListElement());
     	scrollPane.setViewportView(list);
     	this.setLayout(groupLayout);
@@ -120,7 +142,7 @@ public void initList(Result result) {
 		Result result = (Result)arg;
         if(result.mResultCode.equals(ResultCode.ERROR))
         {
-            JOptionPane.showMessageDialog(null, result.mContent, "Thất bại", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, result.mContent, "Tháº¥t báº¡i", JOptionPane.ERROR_MESSAGE);
             return;
         }
         switch (result.mActionType)
@@ -130,6 +152,24 @@ public void initList(Result result) {
         		initList(result);
         		break;
         	}
+        	case ActionType.NOTIFY_JUST_JOIN_ROOM:
+            {
+            	String[] lines = result.mContent.split(";", -1);
+            	String userJoin = lines[1];
+                for(int i=0;i<listRoomModel.size();i++){
+                	if(listRoomModel.elementAt(i).getNameRoom().equals(lines[0])) 
+                	{
+                		listRoomModel.elementAt(i).setCountPeople(listRoomModel.elementAt(i).getCountPeople()+1);
+                		return;
+                	}
+                }
+                
+                break;
+            }
+        	case ActionType.Close_WINDOW_CHAT:
+            {
+            	if (listThread.containsKey(result.mContent)) listThread.remove(result.mContent);
+            }
         	
         }
 	}

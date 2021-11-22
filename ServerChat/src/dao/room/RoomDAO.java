@@ -5,9 +5,6 @@
  */
 package dao.room;
 
-import Common.Common;
-import model.Message;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -15,25 +12,34 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
+import model.MessageRoom;
 
+/**
+ *
+ * @author asus
+ */
 public class RoomDAO {
-    private String jdbcUrl = Common.jdbcUrl;
-    private String jdbcUsername = Common.jdbcUsername;
-    private String jdbcPassword = Common.jdbcPassword;
+    private String jdbcUrl = "jdbc:mysql://localhost:3306/chat?useSSL=false";
+    private String jdbcUsername = "root";
+    private String jdbcPassword = "Hungblo123";
     
-    private static String CREATE_ROOM = "INSERT INTO room " + 
-            "(id,roomname) VALUES " + "(?)";
-    private static String ADD_ROOM_CONNECTION = "INSERT INTO roomConnection (roomID, userID)" +
+    private static final String CREATE_ROOM = "INSERT INTO room " + 
+            "(id,numberOfUser,roomname) VALUES " + "(?,?,?)";
+    private static final String ADD_ROOM_CONNECTION = "INSERT INTO roomConnection (roomID, userID)" +
             "VALUES (?, ?)";
-    private static String DELETE_ROOM_CONNECTION = "DELETE FROM roomConnection where roomID = ? AND userID = ?";
-    private static String SELECT_ROOM_MEMBER_BY_ROMID = "SELECT userID from roomConnection where roomID = ?";
-    private static String SELECT_ROOM_BY_NAME = "SELECT * FROM room WHERE roomName = ?";
-    private static String SELECT_ROOM_BY_ID = "SELECT * FROM room WHERE id = ?";
-    private static String UPDATE_ROOM_NAME = "UPDATE room SET roomName = ? Where id = ?";
-    private static String SELET_ROOM_BY_USERID = "SELECT room.id,room.nameRoom from room, rommConnection";
-    private static String GET_MESS_ROOM = "SELECT userName,content from messageroom where roomID = ?"
-    		+ " ORDER BY id DESC LIMIT 20";
-    private static String INSERT_MESS = "INSERT INTO messageroom(roomID,userID,userName,content) VALUES (?,?,?,?)";
+    private static final String DELETE_ROOM_CONNECTION = "DELETE FROM roomConnection where roomID = ? AND userID = ?";
+    private static final String SELECT_ROOM_MEMBER_BY_ROMID = "SELECT userID,username from roomConnection where roomID = ?";
+    private static final String SELECT_ROOM_BY_NAME = "SELECT * FROM room WHERE roomName = ?";
+    private static final String SELECT_ROOM_BY_ID = "SELECT * FROM room WHERE id = ?";
+    private static final String UPDATE_ROOM_NAME = "UPDATE room SET roomName = ? Where id = ?";
+    private static final String UPDATE_ROOM_MEMBER_COUNT = "UPDATE room SET numberOfUser = ? Where id = ?";
+    private static final String GET_MESS_BY_ROOMID = "select username,content "
+            +"from messageroom inner join user " + "on messageroom.userid = user.id "
+            +"where roomid = ? order by messageroom.id ASC limit 20";
+    private static final String GET_NEWEST_MESS = "select username,content "
+            +"from messageroom inner join user " + "on messageroom.userid = user.id "
+            +"where roomid = ? order by messageroom.id desc limit 1";
+    private static final String INSERT_MESS = "INSERT INTO messageroom (roomID, userID, content) values (?,?,?);";
 
     public RoomDAO() {
     }
@@ -50,33 +56,36 @@ public class RoomDAO {
         return c;
     }
     
-    public void InsertMess(String roomID, int userID,String userName, String content) {
-    	
+    public int InsertMess(String roomID, int userID, String content) {
+    	int s = 0;
         try (Connection c = getConnection();
-                PreparedStatement prepare = c.prepareStatement(CREATE_ROOM)) {
+                PreparedStatement prepare = c.prepareStatement(INSERT_MESS)) {
             
             prepare.setString(1, roomID);
-            prepare.setString(4,content );
-            prepare.setString(3, userName);
+            prepare.setString(3, content);
             prepare.setInt(2, userID);
-            prepare.executeUpdate();
+            s = prepare.executeUpdate();
+            c.close();
+            prepare.close();
             
         } catch (Exception e) {
         }
-        
+        return s;
     }
     
-    public List<Message> getMess(String roomID){
-    	List<Message> list = new ArrayList<>();
-        
+    public List<MessageRoom> getMessByRoomID(String roomID){
+        List<MessageRoom> list = new ArrayList<>();
+            
         try (Connection c = getConnection();
-                PreparedStatement prepare = c.prepareStatement(SELECT_ROOM_MEMBER_BY_ROMID)) {
+                PreparedStatement prepare = c.prepareStatement(GET_MESS_BY_ROOMID)) {
             
             prepare.setString(1, roomID);
             ResultSet rs = prepare.executeQuery();
             while(rs.next()){
-                list.add(new Message(rs.getString("userName"),rs.getString("content")));
+                list.add(new MessageRoom(rs.getString("userName"),rs.getString("content")));
             }
+            c.close();
+            prepare.close();
             
         } catch (Exception e) {
             System.out.println(e);
@@ -84,13 +93,36 @@ public class RoomDAO {
         return list;
     }
     
-    public int createRoom(String name){
+    public MessageRoom getNewestMess(String roomID){
+        MessageRoom mess = null;
+            
+        try (Connection c = getConnection();
+                PreparedStatement prepare = c.prepareStatement(GET_MESS_BY_ROOMID)) {
+            
+            prepare.setString(1, roomID);
+            ResultSet rs = prepare.executeQuery();
+            rs.next();
+             mess = new MessageRoom(rs.getString("userName"),rs.getString("content"));
+             c.close();
+             prepare.close();
+            
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return mess;
+    }
+    
+    public int createRoom(String id,int numberOfUser, String name){
         int status = 0;
         try (Connection c = getConnection();
                 PreparedStatement prepare = c.prepareStatement(CREATE_ROOM)) {
             
-            prepare.setString(1, name);
+            prepare.setString(1, id);
+            prepare.setInt(2,numberOfUser);
+            prepare.setString(3, name);
             status = prepare.executeUpdate();
+            c.close();
+            prepare.close();
             
         } catch (Exception e) {
         }
@@ -105,6 +137,8 @@ public class RoomDAO {
             prepare.setString(1,roomID);
             prepare.setInt(2,userID);
             status = prepare.executeUpdate();
+            c.close();
+            prepare.close();
             
         } catch (Exception e){
             System.out.println(e);
@@ -120,6 +154,8 @@ public class RoomDAO {
             prepare.setString(1, roomID);
             prepare.setInt(2,userID);
             status = prepare.executeUpdate();
+            c.close();
+            prepare.close();
             
         }catch (Exception e){
             System.out.println(e);
@@ -127,14 +163,33 @@ public class RoomDAO {
         return status;
     }
     
-    public int changeRoomName(int roomID, String name){
+    public int changeRoomName(String roomID, String name){
         int status = 0;
         try(Connection c = getConnection();
                 PreparedStatement prepare = c.prepareStatement(UPDATE_ROOM_NAME)){
             
-            prepare.setInt(2, roomID);
+            prepare.setString(2, roomID);
             prepare.setString(1, name);
             status = prepare.executeUpdate();
+            c.close();
+            prepare.close();
+            
+        }catch(Exception e){
+            System.out.println(e);
+        }
+        return status;
+    }
+    
+    public int UpdateMemberCount(String roomID, int count){
+        int status = 0;
+        try(Connection c = getConnection();
+                PreparedStatement prepare = c.prepareStatement(UPDATE_ROOM_MEMBER_COUNT)){
+            
+            prepare.setString(2, roomID);
+            prepare.setInt(1, count);
+            status = prepare.executeUpdate();
+            c.close();
+            prepare.close();
             
         }catch(Exception e){
             System.out.println(e);
@@ -154,6 +209,8 @@ public class RoomDAO {
             while(rs.next()){
                 list.add(rs.getInt("userID"));
             }
+            c.close();
+            prepare.close();
             
         } catch (Exception e) {
             System.out.println(e);

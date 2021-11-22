@@ -1,17 +1,17 @@
 package model;
 
-public class Message {
+public class MessageRoom {
 
 	private String sender;
 	private String mess;
-	private String sendDate;
 	
-	public Message(String sender, String mess, String sendDate) {
+
+	
+	public MessageRoom(String sender, String mess) {
 		this.sender = sender;
 		this.mess = mess;
-		this.sendDate = sendDate;
 	}
-	
+
 	public String getSender() {
 		return sender;
 	}
@@ -20,7 +20,4 @@ public class Message {
 		return mess;
 	}
 	
-	public String getDate() {
-		return sendDate;
-	}
 }
