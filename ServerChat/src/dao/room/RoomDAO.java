@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import model.MessageRoom;
+import model.Room;
 
 /**
  *
@@ -28,9 +29,15 @@ public class RoomDAO {
     private static final String ADD_ROOM_CONNECTION = "INSERT INTO roomConnection (roomID, userID)" +
             "VALUES (?, ?)";
     private static final String DELETE_ROOM_CONNECTION = "DELETE FROM roomConnection where roomID = ? AND userID = ?";
-    private static final String SELECT_ROOM_MEMBER_BY_ROMID = "SELECT userID,username from roomConnection where roomID = ?";
+    private static final String SELECT_ROOM_MEMBER_BY_ROMID = "select user.username from roomconnection "+
+    					"inner join user on roomconnection.userid = user.id "+
+    					"where roomconnection.roomid = ?";
     private static final String SELECT_ROOM_BY_NAME = "SELECT * FROM room WHERE roomName = ?";
-    private static final String SELECT_ROOM_BY_ID = "SELECT * FROM room WHERE id = ?";
+    private static final String SELECT_ROOM_BY_userID = "select room.* from roomconnection "+
+    							"inner join room on roomconnection.roomid = room.id "+
+    							"where roomconnection.userid = ?";
+    private static final String UPDATE_LAST_MESS = "update room "
+    		+ "set lastMess = ? where id = ?;";
     private static final String UPDATE_ROOM_NAME = "UPDATE room SET roomName = ? Where id = ?";
     private static final String UPDATE_ROOM_MEMBER_COUNT = "UPDATE room SET numberOfUser = ? Where id = ?";
     private static final String GET_MESS_BY_ROOMID = "select username,content "
@@ -180,6 +187,23 @@ public class RoomDAO {
         return status;
     }
     
+    public int UpdateLastMess(String roomID, String lastMess){
+        int status = 0;
+        try(Connection c = getConnection();
+                PreparedStatement prepare = c.prepareStatement(UPDATE_LAST_MESS)){
+            
+            prepare.setString(2, roomID);
+            prepare.setString(1, lastMess);
+            status = prepare.executeUpdate();
+            c.close();
+            prepare.close();
+            
+        }catch(Exception e){
+            System.out.println(e);
+        }
+        return status;
+    }
+    
     public int UpdateMemberCount(String roomID, int count){
         int status = 0;
         try(Connection c = getConnection();
@@ -197,17 +221,17 @@ public class RoomDAO {
         return status;
     }
     
-    public List<Integer> getRoomMember(int roomID){
+    public List<String> getRoomMember(String roomID){
         
-        List<Integer> list = new ArrayList<>();
+        List<String> list = new ArrayList<>();
         
         try (Connection c = getConnection();
                 PreparedStatement prepare = c.prepareStatement(SELECT_ROOM_MEMBER_BY_ROMID)) {
             
-            prepare.setInt(1, roomID);
+            prepare.setString(1, roomID);
             ResultSet rs = prepare.executeQuery();
             while(rs.next()){
-                list.add(rs.getInt("userID"));
+                list.add(rs.getString("username"));
             }
             c.close();
             prepare.close();
@@ -216,5 +240,31 @@ public class RoomDAO {
             System.out.println(e);
         }
         return list;
+    }
+    
+    public List<Room> getRoomByUserID(int userID){
+    	List<Room> list = new ArrayList<Room>();
+    	
+    	try (Connection c = getConnection();
+                PreparedStatement prepare = c.prepareStatement(SELECT_ROOM_BY_userID)) {
+            
+    		prepare.setInt(1, userID);
+    		ResultSet rs = prepare.executeQuery();
+    		while(rs.next()) {
+    			String id = rs.getString("id");
+    			int numberOfUser = rs.getInt("numberofuser");
+    			String roomName = rs.getString("roomName");
+    			String lastMess = rs.getString("lastMess");
+    			Room room = new Room(id, roomName, numberOfUser, lastMess);
+    			list.add(room);
+    		}
+            
+            c.close();
+            prepare.close();
+            
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    	return list;
     }
 }

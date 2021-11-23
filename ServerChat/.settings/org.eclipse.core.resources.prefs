@@ -1,4 +1,5 @@
 eclipse.preferences.version=1
+encoding//src/Common/Test.java=UTF-8
 encoding//src/controller/ServerManager.java=UTF-8
 encoding//src/model/User.java=UTF-8
 encoding//src/view/ServerMultiChat.java=UTF-8

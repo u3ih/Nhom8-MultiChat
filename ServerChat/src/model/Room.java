@@ -16,7 +16,16 @@ public class Room {
     
     private ArrayList<User> mListUser = new ArrayList<>();
 
-
+    private String lastMess;
+    
+    public Room(String idRoom, String nameRoom, int countPeople, String lastMess) {
+    	this.idRoom = idRoom;
+    	this.nameRoom = nameRoom;
+    	this.countPeople = countPeople;
+    	this.lastMess = lastMess;
+    }
+    public Room() {}
+    
 	public String getIdRoom() {
 		return idRoom;
 	}
@@ -65,6 +74,12 @@ public class Room {
     {
         return mListUser.size();
     }
+    
+    @Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		return idRoom + " " + countPeople + " " + nameRoom + " " + lastMess;
+	}
     
     public void SendToAllUser(String sender, String content)
     {
@@ -137,6 +152,14 @@ public class Room {
 
 	public void addMess(String sender, String content) {
 		listMess.add(new MessageRoom(sender, content));
+	}
+
+	public String getLastMess() {
+		return lastMess;
+	}
+
+	public void setLastMess(String lastMess) {
+		this.lastMess = lastMess;
 	}
 }
 

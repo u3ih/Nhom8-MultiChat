@@ -71,7 +71,7 @@ public class ListForm extends javax.swing.JFrame implements Observer {
         addWindowListener(new java.awt.event.WindowAdapter() {
             
             public void windowOpened(java.awt.event.WindowEvent evt) {
-            	mclientManager.GetListRoom();
+            	
             }
         });
 
@@ -193,11 +193,7 @@ public class ListForm extends javax.swing.JFrame implements Observer {
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
+        
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -245,7 +241,8 @@ public class ListForm extends javax.swing.JFrame implements Observer {
                 ThreadNewRoom newThreadRoom = new ThreadNewRoom(new ChatGroupForm(mclientManager,lines[0],createNameRoom,1 ));
                 newThreadRoom.run();;
                 listThread.put(lines[0], newThreadRoom);
-                r.setListModel(new Room(lines[0],createNameRoom,1));
+                r.setListModel(new Room(lines[0],createNameRoom,1,"null"));
+                mclientManager.GetListRoom();
                 break;
             }
             case ActionType.JOIN_ROOM:
@@ -255,7 +252,8 @@ public class ListForm extends javax.swing.JFrame implements Observer {
                 ThreadNewRoom newThreadRoom = new ThreadNewRoom(new ChatGroupForm(mclientManager,findIDRoom,lines[0],Integer.parseInt(lines[1]) ));
                 newThreadRoom.run();
                 mclientManager.getMess(findIDRoom);
-                r.setListModel(new Room(findIDRoom,lines[0],Integer.parseInt(lines[1])));
+                mclientManager.GetListRoom();
+                //r.setListModel(new Room(findIDRoom,lines[0],Integer.parseInt(lines[1])));
                 break;
            }
             case ActionType.Close_WINDOW_CHAT:

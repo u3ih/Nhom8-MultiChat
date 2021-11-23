@@ -277,17 +277,19 @@ Result result = (Result)arg;
         case ActionType.SEND_MESSAGE:
         {
             String[] lines = result.mContent.split(";", -1);
-            String sender = lines[0];
-            String messContent = lines[1];
-            System.out.println(sender +" " + messContent +"\n");
-            messContent = messContent.replaceAll("<br>", "\n");  //khi tin nhÃ¡ÂºÂ¯n gÃ¡Â»Â­i Ã„â€˜i Ã„â€˜Ä‚Â£ thay kÄ‚Â½ tÃ¡Â»Â± xuÃ¡Â»â€˜ng dÄ‚Â²ng bÃ¡ÂºÂ±ng <br> nÄ‚Âªn khi nhÃ¡ÂºÂ­n vÃ¡Â»ï¿½ thÄ‚Â¬ thay ngÃ†Â°Ã¡Â»Â£c lÃ¡ÂºÂ¡i
-            if(sender.equals(mClientManager.mNickname))
-            	txtNoiDungChat.append("Me: " + messContent + "\n");
-            
-            
-            
-            else
-            	txtNoiDungChat.append(sender + ": " + messContent + "\n");
+            if(lines[0].equals(mMaPhong)) {
+            	String sender = lines[1];
+                String messContent = lines[2];
+                System.out.println(sender +" " + messContent +"\n");
+                messContent = messContent.replaceAll("<br>", "\n");  //khi tin nhÃ¡ÂºÂ¯n gÃ¡Â»Â­i Ã„â€˜i Ã„â€˜Ä‚Â£ thay kÄ‚Â½ tÃ¡Â»Â± xuÃ¡Â»â€˜ng dÄ‚Â²ng bÃ¡ÂºÂ±ng <br> nÄ‚Âªn khi nhÃ¡ÂºÂ­n vÃ¡Â»ï¿½ thÄ‚Â¬ thay ngÃ†Â°Ã¡Â»Â£c lÃ¡ÂºÂ¡i
+                if(sender.equals(mClientManager.mNickname))
+                	txtNoiDungChat.append("Me: " + messContent + "\n");
+                
+                
+                
+                else
+                	txtNoiDungChat.append(sender + ": " + messContent + "\n");
+            }
             break;
         }
         case ActionType.GET_MESS:
