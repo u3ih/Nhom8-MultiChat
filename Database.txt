@@ -1,0 +1,75 @@
+create database chat;
+use chat;
+
+create table user(
+	id int(4) not null auto_increment,
+	firstName varchar(255) null,
+    midName varchar(255) not null,
+    lastName varchar(255) not null,
+    birthDay varchar(255) not null,
+    age int not null,
+    gender varchar(255) not null,
+    isOnline BOOLEAN not null,
+    username varchar(255) not null,
+    password varchar(255) not null,
+    img varchar(255) not null,
+    primary key(id)
+);
+
+create table room(
+	id varchar(255) not null,
+    numberOfUser int not null,
+    roomName text not null,
+    lastMess text,
+    primary key(id)
+);
+
+create table roomConnection(
+	roomID varchar(255) not null,
+    userID int(4) not null,
+    primary key(roomID,userID),
+    foreign key (roomID) references room(id),
+    foreign key (userID) references user(id)
+);
+
+create table messageRoom(
+    id int not null auto_increment,
+    roomID varchar(255) not null,
+    userID int(4) not null,
+    content text not null,
+    primary key (id),
+    foreign key (roomID) references room(id),
+    foreign key (userID) references user(id)
+);
+
+create table userConnection(
+	id int(5) not null auto_increment,
+    userID1 int(5) not null,
+    userID2 int(5) not null,
+    primary key (id),
+    foreign key (userID1) references user(id),
+    foreign key (userID2) references user(id)
+);
+
+create table messageBox(
+	id int(5) not null auto_increment,
+    userID1 int(5) not null,
+    userID2 int(5) not null,
+    primary key (id),
+    foreign key (userID1) references user(id),
+    foreign key (userID2) references user(id)
+);
+
+create table message(
+	id int not null auto_increment,
+    messBoxID int(5) not null,
+    userID int(4) not null,
+    content text not null,
+    sendDate timestamp not null,
+    primary key (id),
+    foreign key (messBoxID) references messageBox(id),
+    foreign key (userID) references user(id)
+);
+
+INSERT INTO `chat`.`user` (`firstName`, `midName`, `lastName`, `birthDay`, `age`, `gender`, `isOnline`, `username`, `password`, `img`) VALUES ('Tran', 'Trung', 'Hieu', '2000-5-3', '21', 'nam', '0', 'hieutran', 'root', 'oke');
+
