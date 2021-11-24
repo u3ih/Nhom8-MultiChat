@@ -361,7 +361,7 @@ public class ServerManager extends Observable
                     if(room.getIdRoom().equals(maPhong))
                     {
                     	if(user.getmRoom().containsKey(room.getIdRoom())) {
-                    		user.Send(actionType, ResultCode.ERROR, "Báº¡n Ä‘Ã£ á»Ÿ trong phÃ²ng");
+                    		user.Send(actionType, ResultCode.ERROR, "Bạn đã ở trong phòng");
                     		return;
                     	}
                     	else {

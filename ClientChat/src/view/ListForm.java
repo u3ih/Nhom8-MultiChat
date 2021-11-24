@@ -130,7 +130,7 @@ public class ListForm extends javax.swing.JFrame implements Observer {
 			public void ancestorAdded(AncestorEvent event) {
 				FriendListForm p=new FriendListForm();
                 tabbedPane.add(p,"danh sách bạn");
-                r= new RoomListForm(mclientManager);
+                r= new RoomListForm(mclientManager,listThread);
                 tabbedPane.add(r,"danh sách phòng");
 				
 			}
@@ -248,11 +248,13 @@ public class ListForm extends javax.swing.JFrame implements Observer {
             case ActionType.JOIN_ROOM:
             {
             	String[] lines = result.mContent.split(";", -1);
-            	if(listThread.containsKey(findIDRoom)) listThread.remove(findIDRoom);
+            	if(listThread.containsKey(findIDRoom)) return;
+            	else {
                 ThreadNewRoom newThreadRoom = new ThreadNewRoom(new ChatGroupForm(mclientManager,findIDRoom,lines[0],Integer.parseInt(lines[1]) ));
                 newThreadRoom.run();
-                mclientManager.getMess(findIDRoom);
                 mclientManager.GetListRoom();
+                r.addThread(findIDRoom, newThreadRoom);
+            	}
                 //r.setListModel(new Room(findIDRoom,lines[0],Integer.parseInt(lines[1])));
                 break;
            }

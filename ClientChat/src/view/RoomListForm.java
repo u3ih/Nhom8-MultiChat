@@ -45,11 +45,13 @@ public class RoomListForm extends javax.swing.JPanel implements Observer {
 	private GroupLayout groupLayout;
 	private HashMap<String,ThreadNewRoom> listThread = new HashMap<String,ThreadNewRoom>();
 	
-    public RoomListForm(ClientManager clientManager) {
+    public RoomListForm(ClientManager clientManager, HashMap<String,ThreadNewRoom> listThread) {
     	initComponents();
     	this.clientManager = clientManager;
+    	this.listThread = listThread;
     	clientManager.addObserver(this);
     	listRoomModel = (DefaultListModel<Room>) list.getModel();
+    	listRoomModel.setSize(100);
     	clientManager.GetListRoom();
 //    	list.addListSelectionListener(new ListSelectionListener() {
 //			
@@ -65,12 +67,15 @@ public class RoomListForm extends javax.swing.JPanel implements Observer {
         
     }
     
+    public void addThread(String id, ThreadNewRoom thread) {
+    	listThread.put(id, thread);
+    }
 
 	public void setListModel(Room room) {
     	listRoomModel.addElement(room);
     }
     
-public void initList(Result result) {
+	public void initList(Result result) {
         
 	   
     if(result.mContent.length()>0)
@@ -108,6 +113,8 @@ public void initList(Result result) {
     				.addContainerGap())
     	);
     	list = new JList<Room>(new DefaultListModel<Room>());
+    	list.setDragEnabled(true);
+    	list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     	list.addMouseListener(new MouseAdapter() {
     		@Override
     		public void mouseClicked(MouseEvent e) {
@@ -153,7 +160,7 @@ public void initList(Result result) {
             	String[] lines = result.mContent.split(";", -1);
             	String userJoin = lines[1];
                 for(int i=0;i<listRoomModel.size();i++){
-                	if(listRoomModel.elementAt(i).getNameRoom().equals(lines[0])) 
+                	if(listRoomModel.elementAt(i).getIdRoom().equals(lines[0])) 
                 	{
                 		int count = listRoomModel.elementAt(i).getCountPeople()+1;
                 		listRoomModel.elementAt(i).setCountPeople(count);
@@ -169,9 +176,13 @@ public void initList(Result result) {
                 String sender = lines[1];
                 String messContent = lines[2];
                 for(int i=0;i<listRoomModel.size();i++){
-                	if(listRoomModel.elementAt(i).getNameRoom().equals(lines[0])) 
+                	if(listRoomModel.elementAt(i).getIdRoom().equals(lines[0])) 
                 	{
-                		listRoomModel.elementAt(i).setLastMess(sender +": "+ messContent);
+                		Room r = listRoomModel.elementAt(i);
+                		r.setLastMess(sender +": "+ messContent);
+                		System.out.println(r.toString());
+//                		listRoomModel.remove(i);
+                		listRoomModel.addElement(r);
                 		return;
                 	}
                 }
