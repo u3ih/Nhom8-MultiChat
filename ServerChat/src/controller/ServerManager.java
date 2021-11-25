@@ -272,8 +272,11 @@ public class ServerManager extends Observable
             }
             case ActionType.GET_LIST_ROOM:
             {
-                List<Room> list = roomDAO.getRoomByUserID(user.getId());//query cÃ³ dáº¡ng actionType;
+                List<Room> list = roomDAO.getRoomByUserID(user.getId());
+                
+                
                 int size = list.size();
+                System.out.println(size);
                 if(size>0)
                 {
                 	for(Room room:list) {

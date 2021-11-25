@@ -51,19 +51,8 @@ public class RoomListForm extends javax.swing.JPanel implements Observer {
     	this.listThread = listThread;
     	clientManager.addObserver(this);
     	listRoomModel = (DefaultListModel<Room>) list.getModel();
-    	listRoomModel.setSize(100);
     	clientManager.GetListRoom();
-//    	list.addListSelectionListener(new ListSelectionListener() {
-//			
-//			@Override
-//			public void valueChanged(ListSelectionEvent e) {
-//				int s = list.getSelectedIndex();
-//				Room room = listRoomModel.elementAt(s);
-//				ThreadNewRoom newThreadRoom = new ThreadNewRoom(new ChatGroupForm(clientManager,room.getIdRoom(),room.getNameRoom(),room.getCountPeople()));
-//                newThreadRoom.run();
-//                clientManager.getMess(room.getIdRoom());
-//			}
-//		});
+
         
     }
     
@@ -77,8 +66,8 @@ public class RoomListForm extends javax.swing.JPanel implements Observer {
     
 	public void initList(Result result) {
         
-	   
-    if(result.mContent.length()>0)
+	   System.out.println(result.mContent.length());
+    if(result.mContent.length()>0 || result.mContent != "")
     {
         listRoomModel.clear();
         String[] rows = result.mContent.split("<row>");
@@ -88,6 +77,7 @@ public class RoomListForm extends javax.swing.JPanel implements Observer {
             listRoomModel.addElement(new Room(cols[0],cols[1],Integer.parseInt(cols[2]),cols[3]));
             
         }
+        
     }
 	
     }
