@@ -1,0 +1,36 @@
+Cập nhât: git fetch origin <branch>
+	fetch xong thì pull : git pull
+add: git add. (add hết)
+	git add <file> ( add 1 file, hoặc nhiều file thì <file> <file> ...)
+commit: git commit -m <"message">
+Push: git push origin <branch>
+clone project: git clone <đường dẫn>
+revert: git revert -m 1 HEAD^
+
+
+đẩy dữ liệu mới lên:
+git add .
+git commit -m "message"
+git push origin <branch>
+
+lấy dữ liệu mới về:
+git fetch
+git pull origin <branch>
+
+create a new repository on the command line
+echo "# chat-app" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git branch -M main
+git remote add origin https://github.com/hungshidro12/chat-app.git
+git push -u origin main
+
+push an existing repository from the command line
+git remote add origin https://github.com/hungshidro12/chat-app.git
+git branch -M main
+git push -u origin main
+
+note: add xong mới commit, k cần <>, commit xong thì push
+	<branch> là mặc định là master or main
+	
