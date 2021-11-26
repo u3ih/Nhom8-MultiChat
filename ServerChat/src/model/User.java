@@ -44,6 +44,7 @@ public class User {
     private ObjectInputStream mObjectInputStream;
     private HashMap<String, Room> mRoom = new HashMap<String,Room>();
     private List<Room> listRoom = new ArrayList<Room>();
+    private List<User> listUser = new ArrayList<User>();
     private Date mTimeConnect; //thá»�i gian káº¿t ná»‘i Ä‘áº¿n server
 
     public User() {
@@ -84,7 +85,15 @@ public class User {
         this.username = username;
         this.password = password;
     }
-
+    public User(String firstName, String midName, String lastName, String birthDay, int age, String gender, boolean isOnline) {
+        this.firstName = firstName;
+        this.midName = midName;
+        this.lastName = lastName;
+        this.birthDay = birthDay;
+        this.age = age;
+        this.gender = gender;
+        this.isOnline = isOnline;
+    }
     public User(String firstName, String midName, String lastName, String birthDay, int age, String gender) {
         this.firstName = firstName;
         this.midName = midName;
@@ -93,7 +102,6 @@ public class User {
         this.age = age;
         this.gender = gender;
     }
-
     public User(int id, String firstName, String midName, String lastName, String birthDay, int age, String gender) {
         this.id = id;
         this.firstName = firstName;
@@ -102,6 +110,19 @@ public class User {
         this.birthDay = birthDay;
         this.age = age;
         this.gender = gender;
+    }
+    public User(int id, String firstName, String midName, String lastName, String birthDay, int age, String gender,boolean isOnline) {
+        this.id = id;
+        this.firstName = firstName;
+        this.midName = midName;
+        this.lastName = lastName;
+        this.birthDay = birthDay;
+        this.age = age;
+        this.gender = gender;
+        this.isOnline = isOnline;
+    }
+    public User(String uname) {
+    	this.username= uname;
     }
 
 	public int getId() {
@@ -153,6 +174,9 @@ public class User {
 	}
 
 	public String isGender() {
+		return gender;
+	}
+	public String getGender() {
 		return gender;
 	}
 
@@ -325,4 +349,12 @@ public List<Room> getListRoom() {
 public void setListRoom(List<Room> listRoom) {
 	this.listRoom = listRoom;
 }
+public List<User> getListUser() {
+	return listUser;
+}
+
+public void setListUser(List<User> listUser) {
+	this.listUser = listUser;
+}
+
 }

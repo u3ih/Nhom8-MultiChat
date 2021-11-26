@@ -31,6 +31,7 @@ public class ServerManager extends Observable
     ServerSocket mServerSocket;
     Thread mThreadAccept, mThreadProcess;
     //ArrayList<User> mListUser = new ArrayList<>();
+    ArrayList<User> mListFriend = new ArrayList<>();
     ArrayList<User> mListUserOnline = new ArrayList<>();
     ArrayList<Room> mListRoom = new ArrayList<>();
     ArrayList<User> mListUserWaitLogout = new ArrayList<>();
@@ -106,9 +107,9 @@ public class ServerManager extends Observable
             					User uss= new User(Fname,Mname,Lname,Birday,Age,gender,true,Uname,Pass);
             					//System.out.println(uss.toString());
             					UserDAO ud = new UserDAO();
-            					ud.insertUser(uss);
-            					mListUser.put(uss.getUsername(), uss);
+            					ud.insertUser(uss);;
             					mDataOutputStream.writeUTF("OK");
+            					mListUser.put(Uname, uss);
             				} catch (IOException | SQLException e) {
             					mDataOutputStream.writeUTF("ERROR");
             				} 
@@ -253,6 +254,12 @@ public class ServerManager extends Observable
             {
                     user.setOnline(true);
                     user.Send(actionType, ResultCode.OK, "OK");
+                    try {
+                    	controlUser.updateOnline(user);
+                    }catch (Exception e) {
+						// TODO: handle exception
+					}
+                    
                     notifyObservers(user.getUsername() + " vừa đăng nhập thành công");
                 
                 break;
@@ -420,6 +427,12 @@ public class ServerManager extends Observable
             case ActionType.LOGOUT:    //query có dạng actionType;
             {
                 Room room = user.getRoom("gfd");
+                user.setOnline(false);
+                try {
+                	controlUser.updateOnline(user);
+                }catch (Exception e) {
+					// TODO: handle exception
+				}
                 if(room!=null)
                 {
                     room.RemoveUser(user);
@@ -437,6 +450,116 @@ public class ServerManager extends Observable
                 notifyObservers(user.getUsername() + " vừa đăng xuất");
                 break;
 
+            }
+            case ActionType.Get_User_Info:
+            {
+            	String uname = lines[1];
+            	User u= new User();
+            	u=controlUser.selectUserbyuname(uname);
+            	String name=u.getFullName();
+            	String birthday=u.getBirthDay();
+            	String age =Integer.toString(u.getAge());
+            	String gender=u.isGender();
+            	String res=name+"+"+birthday+"+"+age+"+"+gender;
+            	user.Send(actionType, ResultCode.OK, res);
+            	notifyObservers(res + " vừa lay thong tin ");
+            	break;
+            }
+            case ActionType.Set_User_Info:
+            {
+            	String infos = lines[1];
+            	String info[] = infos.split("\\+");
+            	String name[]=info[1].split("\\s",3);
+            	User u= new User();
+            	u.setUsername(info[0]);
+            	u.setFirstName(name[0]);
+            	u.setMidName(name[1]);
+            	u.setLastName(name[2]);
+            	u.setBirthDay(info[2]);
+            	u.setAge(Integer.parseInt(info[3]));
+            	u.setGender(info[4]);
+            	boolean check = false;
+				try {
+					check = controlUser.updateUser(u);
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+            	if(check) {
+            		user.Send(actionType, ResultCode.OK, "Cập nhât thành công");
+            	}
+            	else	user.Send(actionType, ResultCode.ERROR, "Cập nhật thất bại");
+            	notifyObservers(u.getLastName()+" thay đổi thông tin ");
+            	break;
+            }
+            case ActionType.Get_User_Info_byName:
+            {
+            	String name = lines[1];
+            	ArrayList<User> users=controlUser.selectUsersbyName(name);
+            	String res = "";
+            	for(int i=0;i<users.size();i++) {
+            		String id =Integer.toString(users.get(i).getId());
+            		String fullname = users.get(i).getFullName();
+            		String birthday = users.get(i).getBirthDay();
+            		String age = Integer.toString(users.get(i).getAge());
+            		String gender = users.get(i).isGender();
+            		res+=id+"<cols>"+fullname+"<cols>"+birthday+"<cols>"+age+"<cols>"+gender+"<row>";	
+            	}
+            	user.Send(actionType, ResultCode.OK, res);
+            	break;
+            }
+            case ActionType.Ket_Ban:
+            { 
+            	String id = lines[1];
+            	int a= Integer.parseInt(id);
+            	String uname = lines[2];
+            	boolean check = false;
+				try {
+					check=controlUser.insertUserconnection(a,uname);
+					
+				} catch (SQLException e) {
+					 //TODO Auto-generated 
+					e.printStackTrace();
+				}
+				if(check) {
+					User user1 = controlUser.selectUser(a);
+					String res=user1.getFirstName()+";"+user1.getMidName()+";"+user1.getLastName()+";"+user1.getBirthDay()+";"+Integer.toString(user1.getAge())+";"+user1.getGender();
+            		user.Send(actionType, ResultCode.OK, res);
+            		mListFriend.add(user1);
+            	}
+            	else	user.Send(actionType, ResultCode.ERROR, "thất bại");
+            	notifyObservers(uname+" ket ban ");
+            	break;
+            }
+            case ActionType.GET_LIST_FRIEND:
+            {
+            	//String id = lines[1];
+            	String uname =lines[1];
+            	int id = controlUser.selectIDbyuname(uname);
+//            	//int a= Integer.parseInt(id);
+            	//List<User> list = user.getId();//query có dạng actionType;
+            	List<User> list = controlUser.selectFriendbyId(id);
+//               
+            	//List<Room> list = roomDAO.getRoomByUserID(user.getId());//query cÃ³ dáº¡ng actionType;
+                int size = list.size();
+                if(size>0)
+                {
+                	for(User u:list) {
+                        System.out.println(u.toString());    
+                       }
+                	String listFriend = "";
+                	for(User u:list) {
+                     listFriend += u.getFirstName() +"<col>" +u.getMidName()+"<col>" +u.getLastName()+"<col>" 
+                	+u.getBirthDay()+"<col>" +u.getAge()+"<col>" +u.getGender()+"<col>"+u.isOnline()+ "<row>";    
+                    }
+                    System.out.print(listFriend);
+                    user.Send(actionType, ResultCode.OK, listFriend);
+                }else
+                {
+                    user.Send(actionType, ResultCode.OK, "");
+                }
+                notifyObservers(user.getUsername() + " vừa lấy danh sách friend");
+                break;
             }
         }
     }

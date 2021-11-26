@@ -161,6 +161,7 @@ public class LoginForm extends javax.swing.JFrame implements Observer {
             ListForm listForm = new ListForm(mClientManager, this);
             listForm.setVisible(true);
             this.setVisible(false);
+            //mClientManager.addObserver(listForm);
         }
     }
     private void jButtonLoginPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
@@ -195,7 +196,10 @@ public class LoginForm extends javax.swing.JFrame implements Observer {
     /**
      * @param args the command line arguments
      */
-
+    public void setEmptyText() {
+    	txtNickName.setText("");
+    	txtPassword.setText("");
+    }
     private void btnRegisterActionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
     	RegisterForm mRegis=new RegisterForm();

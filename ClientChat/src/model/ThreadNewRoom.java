@@ -16,7 +16,7 @@ public class ThreadNewRoom {
 	public void run() {
 		
 		chat.setVisible(true);
-		chat.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+//		chat.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		
 	}
 

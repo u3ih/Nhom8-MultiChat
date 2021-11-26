@@ -78,7 +78,7 @@ public class RegisterForm extends javax.swing.JFrame implements Observer{
         jLabel6 = new javax.swing.JLabel();
         jTextFieldBirth = new javax.swing.JTextField();
         jCheckBox1 = new javax.swing.JCheckBox();
-        jCheckBox2 = new javax.swing.JCheckBox();
+        jCheckBox_nu = new javax.swing.JCheckBox();
         jTextFieldAge = new javax.swing.JTextField();
         jLabel7 = new javax.swing.JLabel();
         jTextFieldFN = new javax.swing.JTextField();
@@ -117,8 +117,8 @@ public class RegisterForm extends javax.swing.JFrame implements Observer{
         jCheckBox1.setSelected(true);
         jCheckBox1.setText("Nam");
 
-        buttonGroup1.add(jCheckBox2);
-        jCheckBox2.setText("N\u1EEF");
+        buttonGroup1.add(jCheckBox_nu);
+        jCheckBox_nu.setText("N\u1EEF");
 
         jLabel7.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
         jLabel7.setText("H\u1ECD");
@@ -184,7 +184,7 @@ public class RegisterForm extends javax.swing.JFrame implements Observer{
         								.addGroup(layout.createSequentialGroup()
         									.addComponent(jCheckBox1)
         									.addPreferredGap(ComponentPlacement.RELATED)
-        									.addComponent(jCheckBox2)))
+        									.addComponent(jCheckBox_nu)))
         							.addGap(0, 221, Short.MAX_VALUE))
         						.addComponent(jTextFieldBirth, 321, 321, 321))))
         			.addGap(39))
@@ -226,7 +226,7 @@ public class RegisterForm extends javax.swing.JFrame implements Observer{
         					.addGroup(layout.createParallelGroup(Alignment.BASELINE)
         						.addComponent(jLabel5)
         						.addComponent(jCheckBox1)
-        						.addComponent(jCheckBox2))
+        						.addComponent(jCheckBox_nu))
         					.addGap(32)
         					.addGroup(layout.createParallelGroup(Alignment.BASELINE)
         						.addComponent(jLabel6)
@@ -252,26 +252,43 @@ public class RegisterForm extends javax.swing.JFrame implements Observer{
     	//String message="";
     	
     	//if(jTextFieldUN.getText()!="")
-    	
-		String Fname=jTextFieldFN.getText();
-		String Mname=jTextFieldMN.getText();
-		String Lname=jTextFieldLN.getText();
-		String Birday=jTextFieldBirth.getText();
-		int Age=Integer.parseInt(jTextFieldAge.getText());
-		String Uname=jTextFieldUN.getText();
-		String Pass=String.valueOf(jPasswordFieldPass.getPassword());
-		String gender = "Nam";
-		String msg = "" + Fname;
-        msg += " \n";
-		ClientManager cm = new ClientManager(this);
-		//cm.StartConnect(Uname, Pass)
-		if(cm.Register(Fname, Mname, Lname, Birday, Age, Uname, Pass, gender)) {
-			LoginForm mLogin=new LoginForm();
-	    	mLogin.setVisible(true);
-	    	mLogin.pack();
-	    	mLogin.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	    	mLogin.setLocationRelativeTo(null);
-			this.dispose();
+    	try {
+    		String Fname=jTextFieldFN.getText().trim();
+    		String Mname=jTextFieldMN.getText().trim();
+    		String Lname=jTextFieldLN.getText().trim();
+    		String Birday=jTextFieldBirth.getText().trim();
+    		int Age=Integer.parseInt(jTextFieldAge.getText());
+    		String Uname=jTextFieldUN.getText().trim();
+    		String Pass=String.valueOf(jPasswordFieldPass.getPassword());
+    		String gender = "Nam";
+    		if(jCheckBox_nu.isSelected()) {
+    			gender="Nu";
+    		}
+    		 if(Fname.isBlank() || Mname.isBlank() || Lname.isBlank() || Birday.isBlank() || Uname.isBlank() || Pass.isBlank() ) {
+    				JOptionPane.showMessageDialog(null, "vui lòng nhập đủ thông tin","Chưa nhập thông tin",JOptionPane.WARNING_MESSAGE);
+    				jTextFieldFN.requestFocus();
+    				jTextFieldMN.requestFocus();
+    				jTextFieldLN.requestFocus();
+    				jTextFieldBirth.requestFocus();
+    				jTextFieldUN.requestFocus();
+    				jPasswordFieldPass.requestFocus();
+    				return;
+    		 }
+    		 if(mClientManager!=null)
+    	        {
+    	            mClientManager.Dispose();
+    	        }    
+    		ClientManager cm = new ClientManager(this);
+    		cm.Register(Fname, Mname, Lname, Birday, Age, Uname, Pass, gender);
+    		
+    		if(!cm.isSuccessReg()) {
+    			JOptionPane.showMessageDialog(null, "tên đăng nhập đã trùng");
+    		}
+    		else {
+    			JOptionPane.showMessageDialog(null, "Đã đăng ký thành công");
+    		}
+		} catch (NumberFormatException e1) {
+			JOptionPane.showMessageDialog(null, "vui lòng nhập đủ thông tin","Chưa nhập thông tin",JOptionPane.WARNING_MESSAGE);
 		}
 //		if(cm.isSuccessReg()) {
 //			LoginForm mLogin=new LoginForm();
@@ -296,7 +313,7 @@ public class RegisterForm extends javax.swing.JFrame implements Observer{
     private javax.swing.JButton jButton1;
     private javax.swing.JButton btnDangKy;
     private javax.swing.JCheckBox jCheckBox1;
-    private javax.swing.JCheckBox jCheckBox2;
+    private javax.swing.JCheckBox jCheckBox_nu;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

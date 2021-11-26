@@ -4,6 +4,7 @@ import javax.swing.JOptionPane;
 import javax.swing.GroupLayout.Alignment;
 
 import java.awt.event.WindowListener;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Observable;
 import java.util.Observer;
@@ -22,8 +23,13 @@ import model.Result;
 import model.ResultCode;
 import model.Room;
 import model.ThreadNewRoom;
+import model.User;
 
 import javax.swing.event.AncestorEvent;
+import javax.swing.JTextField;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.ActionEvent;
 
 /**
  *
@@ -35,12 +41,13 @@ public class ListForm extends javax.swing.JFrame implements Observer {
      * Creates new form ListForm
      */
 	 ClientManager mclientManager;
+	 String mNickName;
 	 LoginForm loginForm;
 	 private String createNameRoom = "";
 	 private String findIDRoom = "";
 	 private HashMap<String,ThreadNewRoom> listThread = new HashMap<String,ThreadNewRoom>();
 	 private RoomListForm r;
-	 
+	 private FriendListForm p;
 	
     public ListForm(ClientManager clientManager,LoginForm loginForm) {
         initComponents();
@@ -61,29 +68,35 @@ public class ListForm extends javax.swing.JFrame implements Observer {
 
         jButton2 = new javax.swing.JButton();
         jButton1 = new javax.swing.JButton();
+        jButton1.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		btntim(e);
+        	}
+        });
         jLabel6 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
-        jComboBox1 = new javax.swing.JComboBox<>();
 
         jButton2.setText("jButton2");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         addWindowListener(new java.awt.event.WindowAdapter() {
-            
-            public void windowOpened(java.awt.event.WindowEvent evt) {
-            	
+        	public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
             }
+            
         });
-
         jButton1.setText("Thêm bạn");
 
         jLabel6.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        jLabel6.setText("Wjpu Lord");
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowOpened(java.awt.event.WindowEvent evt) {
+                formWindowOpened(evt);
+            }
+        });
+       // jLabel6.setText("Wjpu Lord");
 
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Image/10207-man-student-light-skin-tone-icon-64.png")));
-
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Change Profile", "Change Pass", "Logout" }));
         
         JButton createRoom = new JButton("Tạo phòng chat");
         
@@ -128,39 +141,61 @@ public class ListForm extends javax.swing.JFrame implements Observer {
 			
 			@Override
 			public void ancestorAdded(AncestorEvent event) {
-				FriendListForm p=new FriendListForm();
+				 p=new FriendListForm(mclientManager);
                 tabbedPane.add(p,"danh sách bạn");
                 r= new RoomListForm(mclientManager,listThread);
                 tabbedPane.add(r,"danh sách phòng");
 				
 			}
 		});
+        
+        JButton btnNewButton = new JButton("View Profile");
+        btnNewButton.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		try {
+					jButtonViewInfoPerformed(e);
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+        	}
+        });
+        
+        JButton btnLogout = new JButton("Đăng xuất");
+        btnLogout.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		btnLogoutActionPerformed(e);
+        	}
+
+			
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         layout.setHorizontalGroup(
         	layout.createParallelGroup(Alignment.LEADING)
         		.addGroup(layout.createSequentialGroup()
+        			.addGap(18)
         			.addGroup(layout.createParallelGroup(Alignment.LEADING)
+        				.addComponent(tabbedPane, GroupLayout.DEFAULT_SIZE, 423, Short.MAX_VALUE)
         				.addGroup(layout.createSequentialGroup()
-        					.addGap(29)
-        					.addComponent(jButton1))
-        				.addGroup(layout.createSequentialGroup()
-        					.addGap(18)
+        					.addComponent(jLabel1, GroupLayout.PREFERRED_SIZE, 96, GroupLayout.PREFERRED_SIZE)
+        					.addPreferredGap(ComponentPlacement.UNRELATED)
         					.addGroup(layout.createParallelGroup(Alignment.LEADING)
-        						.addComponent(tabbedPane, GroupLayout.DEFAULT_SIZE, 423, Short.MAX_VALUE)
+        						.addComponent(jLabel6, GroupLayout.PREFERRED_SIZE, 115, GroupLayout.PREFERRED_SIZE)
         						.addGroup(layout.createSequentialGroup()
-        							.addComponent(jLabel1, GroupLayout.PREFERRED_SIZE, 96, GroupLayout.PREFERRED_SIZE)
-        							.addPreferredGap(ComponentPlacement.UNRELATED)
-        							.addGroup(layout.createParallelGroup(Alignment.LEADING)
-        								.addGroup(layout.createSequentialGroup()
-        									.addComponent(jLabel6, GroupLayout.PREFERRED_SIZE, 115, GroupLayout.PREFERRED_SIZE)
-        									.addPreferredGap(ComponentPlacement.RELATED, 111, Short.MAX_VALUE)
-        									.addComponent(jComboBox1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-        								.addGroup(layout.createSequentialGroup()
-        									.addComponent(createRoom)
-        									.addGap(18)
-        									.addComponent(findRoom)))))))
+        							.addComponent(createRoom)
+        							.addGap(18)
+        							.addComponent(findRoom)))
+        					.addPreferredGap(ComponentPlacement.RELATED, 93, Short.MAX_VALUE)))
         			.addContainerGap())
+        		.addGroup(layout.createSequentialGroup()
+        			.addGap(29)
+        			.addComponent(jButton1)
+        			.addGap(93)
+        			.addComponent(btnNewButton, GroupLayout.PREFERRED_SIZE, 87, GroupLayout.PREFERRED_SIZE)
+        			.addPreferredGap(ComponentPlacement.RELATED, 47, Short.MAX_VALUE)
+        			.addComponent(btnLogout)
+        			.addGap(21))
         );
         layout.setVerticalGroup(
         	layout.createParallelGroup(Alignment.LEADING)
@@ -169,9 +204,7 @@ public class ListForm extends javax.swing.JFrame implements Observer {
         			.addGroup(layout.createParallelGroup(Alignment.LEADING)
         				.addComponent(jLabel1, GroupLayout.PREFERRED_SIZE, 92, GroupLayout.PREFERRED_SIZE)
         				.addGroup(layout.createSequentialGroup()
-        					.addGroup(layout.createParallelGroup(Alignment.BASELINE)
-        						.addComponent(jLabel6, GroupLayout.PREFERRED_SIZE, 28, GroupLayout.PREFERRED_SIZE)
-        						.addComponent(jComboBox1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+        					.addComponent(jLabel6, GroupLayout.PREFERRED_SIZE, 28, GroupLayout.PREFERRED_SIZE)
         					.addGap(18)
         					.addGroup(layout.createParallelGroup(Alignment.BASELINE)
         						.addComponent(createRoom)
@@ -179,14 +212,45 @@ public class ListForm extends javax.swing.JFrame implements Observer {
         			.addPreferredGap(ComponentPlacement.RELATED)
         			.addComponent(tabbedPane, GroupLayout.PREFERRED_SIZE, 390, GroupLayout.PREFERRED_SIZE)
         			.addGap(72)
-        			.addComponent(jButton1)
+        			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
+        				.addComponent(jButton1)
+        				.addComponent(btnNewButton)
+        				.addComponent(btnLogout))
         			.addContainerGap(36, Short.MAX_VALUE))
         );
         getContentPane().setLayout(layout);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-    
+    protected void formWindowClosing(WindowEvent evt) {
+		// TODO Auto-generated method stub
+    	mclientManager.Logout();
+	}
+
+	private void btnLogoutActionPerformed(ActionEvent e) {
+		// TODO Auto-generated method stub
+    	mclientManager.Logout();
+    	mclientManager.Dispose();
+    	loginForm.setEmptyText();
+        loginForm.setVisible(true);
+        this.dispose();
+	}
+    protected void btntim(ActionEvent e) {
+		// TODO Auto-generated method stub
+    	friendAddForm faf= new friendAddForm(this, mclientManager,p);
+		faf.setVisible(true);
+	}
+
+	protected void formWindowOpened(WindowEvent evt) {
+		jLabel6.setText(mclientManager.mNickname);
+//		mclientManager.GetListFriend(mclientManager.mNickname);
+	}
+
+	protected void jButtonViewInfoPerformed(ActionEvent e) throws IOException {
+		// TODO Auto-generated method stub
+		ViewProfileForm v= new ViewProfileForm(mclientManager);
+		v.setVisible(true);
+	}
     
     
     /**
@@ -217,7 +281,6 @@ public class ListForm extends javax.swing.JFrame implements Observer {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
-    private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel6;
     private JTabbedPane tabbedPane;
@@ -262,8 +325,18 @@ public class ListForm extends javax.swing.JFrame implements Observer {
             {
             	if (listThread.containsKey(result.mContent)) listThread.remove(result.mContent);
             }
+//            case ActionType.GET_LIST_FRIEND:
+//            {
+//            	textField.setText(result.mContent);
+//            	String[] lines = result.mContent.split("<row>");
+//            	int size = lines.length;
+//            	for(int i=0;i<size;i++) {
+//            		String[] lin = lines[i].split("<col>");
+//                	
+//                	//p.setListModel(new User(lin[0],lin[1],lin[2],lin[3],Integer.parseInt(lin[4]),lin[5]));
+//            	}
+//          	break;
+//            }
         }   
 	}
-
-	
 }

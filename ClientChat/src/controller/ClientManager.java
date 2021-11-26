@@ -9,6 +9,7 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.logging.Level;
@@ -31,6 +32,8 @@ public class ClientManager extends Observable{
     ObjectInputStream mObjectInputStream;
     Thread mThread;
     public String mNickname;
+    public int mID;
+    ArrayList<User> mListUserOnline = new ArrayList<>();
     @SuppressWarnings("deprecation")
 	public ClientManager(Observer obs)  //hÃ m khá»Ÿi táº¡o khi chÆ°a cÃ³ socket
     {
@@ -233,9 +236,9 @@ public class ClientManager extends Observable{
 		try {
 			result = mDataInputStream.readUTF();
 			return s.equals(result);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		 } catch (IOException ex) {
+	            Result result1 = new Result("", ResultCode.ERROR, "Không thể kết nối tới server");
+	            notifyObservers(result1);
 		}
     	return false;
     }
@@ -252,7 +255,30 @@ public class ClientManager extends Observable{
             notifyObservers(result);
         }
     }
-    
+    public void GetListFriend(String uname)
+    {
+        String line = ActionType.GET_LIST_FRIEND + ";"+uname;
+        try
+        {
+            mBufferWriter.write(line + "\n");
+            mBufferWriter.flush();
+        } catch (IOException ex) {
+            Result result = new Result("", ResultCode.ERROR, "Káº¿t ná»‘i tá»›i server cÃ³ lá»—i");
+            notifyObservers(result);
+        }
+    }
+    public void GetFriendOnline(String uname)
+    {
+        String line = ActionType.GET_Online + ";"+uname;
+        try
+        {
+            mBufferWriter.write(line + "\n");
+            mBufferWriter.flush();
+        } catch (IOException ex) {
+            Result result = new Result("", ResultCode.ERROR, "Káº¿t ná»‘i tá»›i server cÃ³ lá»—i");
+            notifyObservers(result);
+        }
+    }
     public void GetRoomMember(String roomID) {
     	String line = ActionType.GET_ROOM_MEMBER + ";" + roomID;
     	try {
@@ -315,6 +341,53 @@ public class ClientManager extends Observable{
             Result result = new Result("", ResultCode.ERROR, "Không thể kết nối tới server");
             notifyObservers(result);
         }
+    }
+    public void getinfo(String uname) 
+    {
+    		String line = ActionType.Get_User_Info +";"+uname;
+    		try {
+				mBufferWriter.write(line+"\n");
+				mBufferWriter.flush();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				Result result = new Result("", ResultCode.ERROR, "Kết nối tới server có lỗi");
+				notifyObservers(result);
+			}
+    }
+    public void setinfo(String uname,String name,String birthday,String age,String gender) 
+    {
+    		String line = ActionType.Set_User_Info +";"+uname+"+"+name+"+"+birthday+"+"+age+"+"+gender;
+    		try {
+				mBufferWriter.write(line+"\n");
+				mBufferWriter.flush();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				Result result = new Result("", ResultCode.ERROR, "Kết nối tới server có lỗi");
+				notifyObservers(result);
+			}
+    }
+    public void getinfobyName(String name) 
+    {
+    		String line = ActionType.Get_User_Info_byName +";"+name;
+    		try {
+				mBufferWriter.write(line+"\n");
+				mBufferWriter.flush();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				Result result = new Result("", ResultCode.ERROR, "Kết nối tới server có lỗi");
+				notifyObservers(result);
+			}
+    }
+    public void ketban(int userID, String uname) {
+    	String line = ActionType.Ket_Ban + ";"+ userID+";"+uname;
+    	try {
+			mBufferWriter.write(line+"\n");
+			mBufferWriter.flush();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			Result result = new Result("", ResultCode.ERROR, "Kết nối tới server có lỗi");
+			notifyObservers(result);
+		}
     }
     
     

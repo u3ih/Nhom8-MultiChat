@@ -17,4 +17,10 @@ public class ActionType {
     public static final String GET_MESS = "13";
     public static final String SEND_FILE = "14";
     public static final String REGISTER="15";
+    public static final String Get_User_Info = "16";
+    public static final String Set_User_Info = "17";
+    public static final String Get_User_Info_byName = "18";
+    public static final String Ket_Ban = "19";
+    public static final String GET_LIST_FRIEND = "20"; 
+    public static final String GET_Online = "21";
 }

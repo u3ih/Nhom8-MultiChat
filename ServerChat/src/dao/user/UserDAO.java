@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import Common.Common;
@@ -23,9 +24,18 @@ public class UserDAO {
     private static final String SELECT_USER_BY_ID = "select id,firstName,midName,lastName,birthDay,age,gender from user where id =  ?";
     private static final String SELECT_ALL_USER = "select * from user";
     private static final String DELETE_USER_SQL = "delete from user where id = ?;";
-    private static final String UPDATE_USER_SQL = "update user set firstName = ?,midName = ?,lastName  =  ?,birthDay = ?,age = ?,gender = ? where  id =  ?;";
+    private static final String UPDATE_USER_SQL = "update user set firstName = ?,midName = ?,lastName  =  ?,birthDay = ?,age = ?,gender = ? where  username =  ?";
     private static final String LOGIN = "SELECT id,firstName,midName,lastName,birthDay,age,gender,isOnline,img from user where username =? and password = ?";
-   
+    private static final String SELECT_USER_BY_UNAME = "select firstName,midName,lastName,birthDay,age,gender from user where username =  ?";
+    //private static final String SELECT_FRIENDUSER_BY_ID = "select firstName,midName,lastName,birthDay,age,gender from user where id =  ?";
+    private static final String SELECT_FRIENDUSER_BY_ID = "SELECT * FROM chat.userconnection inner join chat.user on user.id=userconnection.userID2 where userID1=?";
+    
+    private static final String SELECT_ID_BY_UNAME = "select id from user where username =  ?";
+    private static final String SELECT_USER_BY_NAME = "select id,firstName,midName,lastName,birthDay,age,gender from user where lastName=?";
+    private static final String INSERT_USERCONNECTION_SQL = "INSERT INTO userconnection" + " (userID1,userID2) VALUES " +" (?, ?);";
+    private static final String SELECT_ID_FRIEND =" select userID2 from userconnection where userID1 =?";
+    private static final String UPDATE_USER_ONLINE = "update user set isOnline = ? where username = ?";
+    private static final String SELECT_isOnline_BY_UNAME = "select isOnline from user where username =  ?";
     public UserDAO() {
     }
 
@@ -125,7 +135,146 @@ public class UserDAO {
         }
         return users;
     }
+    public User selectUserbyuname(String uname) {
+        User user = null;
+        // Step 1: Establishing a Connection
+        try (Connection connection = getConnection();
+                // Step 2:Create a statement using connection object
+                PreparedStatement preparedStatement
+                = connection.prepareStatement(SELECT_USER_BY_UNAME);) {
+            preparedStatement.setString(1, uname);
+            System.out.println(preparedStatement);
+            // Step 3: Execute the query or update query
+            ResultSet rs = preparedStatement.executeQuery();
+            // Step 4: Process the ResultSet object.
+            while (rs.next()) {
+                String firstName = rs.getString("firstName");
+                String midName = rs.getString("midName");
+                String lastName = rs.getString("lastName");
+                String birthDay = rs.getString("birthDay");
+                int age = rs.getInt("age");
+                String gender = rs.getString("gender");
+                user = new User( firstName, midName, lastName, birthDay, age, gender);
+            }
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+        return user;
+    }
+    public int selectIDbyuname(String uname) {
+    	int id=0;
+    	try (Connection connection = getConnection();
+                
+                PreparedStatement preparedStatement
+                = connection.prepareStatement(SELECT_ID_BY_UNAME);) {
+            preparedStatement.setString(1, uname);
+            System.out.println(preparedStatement);
+            ResultSet rs = preparedStatement.executeQuery();
+            while(rs.next()) {
+            	id=rs.getInt("id");
+            }
+    	}catch (SQLException e) {
+                System.out.println(e);
+            }
+            return id;
+    }
+    public boolean getListFrinedOnline(String uname) {
+    	boolean isOnline =false;
+    	try (Connection connection = getConnection();
+                
+                PreparedStatement preparedStatement
+                = connection.prepareStatement(SELECT_isOnline_BY_UNAME);) {
+            preparedStatement.setString(1, uname);
+            System.out.println(preparedStatement);
+            ResultSet rs = preparedStatement.executeQuery();
+            while(rs.next()) {
+            	
+            	isOnline = rs.getBoolean("isOnline");
+            }
+    	}catch (SQLException e) {
+                System.out.println(e);
+            }
+            return isOnline;
+    }
+    public int selectIdFriend(int userID1) {
+    	int id=0;
+    	try (Connection connection = getConnection();
+                
+                PreparedStatement preparedStatement
+                = connection.prepareStatement(SELECT_ID_FRIEND);) {
+            preparedStatement.setInt(1, userID1);
+            System.out.println(preparedStatement);
+            ResultSet rs = preparedStatement.executeQuery();
+            while(rs.next()) {
+            	id=rs.getInt("id");
+            }
+    	}catch (SQLException e) {
+                System.out.println(e);
+            }
+            return id;
+    }
+    public ArrayList<User> selectFriendbyId(int userID){
+    	ArrayList<User> users = new ArrayList<>();
+    	try (Connection connection = getConnection();
+                
+                PreparedStatement preparedStatement
+                = connection.prepareStatement(SELECT_FRIENDUSER_BY_ID);) {       	
+        		//userID2 = selectIdFriend()
+    		preparedStatement.setInt(1, userID);
+            System.out.println(preparedStatement);
+            // Step 3: Execute the query or update query
+            ResultSet rs = preparedStatement.executeQuery();
+            while (rs.next()) {
+            	int id= rs.getInt("id");
+                String firstName = rs.getString("firstName");
+                String midName = rs.getString("midName");
+                String lastName = rs.getString("lastName");
+                String birthDay = rs.getString("birthDay");
+                int age = rs.getInt("age");
+                String gender = rs.getString("gender");
+                boolean isOnline = rs.getBoolean("isOnline");
+                users.add(new User(id,firstName, midName, lastName, birthDay, age, gender,isOnline));
+            	}
+            }
+            catch (SQLException e) {
+            System.out.println(e);
+        }
+        return users;
+    }
     
+    public ArrayList<User> selectUsersbyName(String name) {
+        // using try-with-resources to avoid closing resources (boiler plate code)
+    	ArrayList<User> users = new ArrayList<>();
+    	
+        // Step 1: Establishing a Connection
+        try (Connection connection = getConnection();
+                // Step 2:Create a statement using connection object
+        		
+        		
+                PreparedStatement preparedStatement
+                = connection.prepareStatement(SELECT_USER_BY_NAME);) {       	
+        		preparedStatement.setString(1, name);
+            System.out.println(preparedStatement);
+            // Step 3: Execute the query or update query
+            ResultSet rs = preparedStatement.executeQuery();
+            // Step 4: Process the ResultSet object.
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String firstName = rs.getString("firstName");
+                String midName = rs.getString("midName");
+                String lastName = rs.getString("lastName");
+                String birthDay = rs.getString("birthDay");
+                int age = rs.getInt("age");
+                String gender = rs.getString("gender");
+                
+                users.add(new User(id,firstName, midName, lastName, birthDay, age, gender));
+            	}
+            }
+            catch (SQLException e) {
+            System.out.println(e);
+        }
+        return users;
+    }
     public User Login(String username, String password) {
     	User user = new User();
     	try (Connection connection = getConnection();
@@ -163,6 +312,22 @@ public class UserDAO {
 		}
     	return user;
     }
+    public boolean insertUserconnection(int userID1,String uname) throws SQLException {
+    	boolean rowUpdated=false;
+        try (Connection connection = getConnection(); 
+                PreparedStatement statement
+                = connection.prepareStatement(INSERT_USERCONNECTION_SQL)) {
+            int userID2= selectIDbyuname(uname);
+            statement.setInt(1, userID2);
+            statement.setInt(2, userID1);
+            
+           rowUpdated = statement.executeUpdate() > 0;
+           
+        } catch (Exception e){
+         System.out.println(e);
+      }
+     return rowUpdated;  
+    }
 
     public boolean deleteUser(int id) throws SQLException {
         boolean rowDeleted;
@@ -185,9 +350,21 @@ public class UserDAO {
             statement.setString(4, user.getBirthDay());
             statement.setInt(5, user.getAge());
             statement.setString(6, user.isGender());
-            statement.setInt(7, user.getId());
+            //statement.setInt(7, user.getId());
+            statement.setString(7, user.getUsername());
             rowUpdated = statement.executeUpdate() > 0;
         }
         return rowUpdated;
+    }
+    public void updateOnline (User user) throws SQLException {
+    	boolean rUpdated;
+    	try (Connection connection = getConnection(); 
+                PreparedStatement statement
+                = connection.prepareStatement(UPDATE_USER_ONLINE);) {
+    		statement.setBoolean(1, user.isOnline());
+    		statement.setString(2, user.getUsername());
+    	 statement.executeUpdate();
+    	}
+    	//return rUpdated;
     }
 }

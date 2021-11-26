@@ -59,7 +59,15 @@ public class User {
         this.username = username;
         this.password = password;
     }
-
+    public User(String firstName, String midName, String lastName, String birthDay, int age, String gender, boolean isOnline) {
+        this.firstName = firstName;
+        this.midName = midName;
+        this.lastName = lastName;
+        this.birthDay = birthDay;
+        this.age = age;
+        this.gender = gender;
+        this.isOnline = isOnline;
+    }
     public User(String firstName, String midName, String lastName, String birthDay, int age, String gender) {
         this.firstName = firstName;
         this.midName = midName;
@@ -68,7 +76,6 @@ public class User {
         this.age = age;
         this.gender = gender;
     }
-
     public User(int id, String firstName, String midName, String lastName, String birthDay, int age, String gender) {
         this.id = id;
         this.firstName = firstName;
@@ -77,6 +84,16 @@ public class User {
         this.birthDay = birthDay;
         this.age = age;
         this.gender = gender;
+    }
+    public User(int id, String firstName, String midName, String lastName, String birthDay, int age, String gender,boolean isOnline) {
+        this.id = id;
+        this.firstName = firstName;
+        this.midName = midName;
+        this.lastName = lastName;
+        this.birthDay = birthDay;
+        this.age = age;
+        this.gender = gender;
+        this.isOnline = isOnline;
     }
 
 	public User(Socket socket) throws IOException
@@ -94,7 +111,85 @@ public class User {
         }
         return null;
     }
-    
+    public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	public String getMidName() {
+		return midName;
+	}
+
+	public void setMidName(String midName) {
+		this.midName = midName;
+	}
+
+	public String getLastName() {
+		return lastName;
+	}
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+
+	public String getBirthDay() {
+		return birthDay;
+	}
+
+	public void setBirthDay(String birthDay) {
+		this.birthDay = birthDay;
+	}
+
+	public int getAge() {
+		return age;
+	}
+
+	public void setAge(int age) {
+		this.age = age;
+	}
+
+	public String getGender() {
+		return gender;
+	}
+
+	public void setGender(String gender) {
+		this.gender = gender;
+	}
+
+	public boolean isOnline() {
+		return isOnline;
+	}
+
+	public void setOnline(boolean isOnline) {
+		this.isOnline = isOnline;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
     public boolean Ready() throws IOException
     {
         return mBufferReader.ready();

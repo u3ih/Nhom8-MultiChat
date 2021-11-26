@@ -22,7 +22,7 @@ import model.Room;
 public class RoomDAO {
     private String jdbcUrl = "jdbc:mysql://localhost:3306/chat?useSSL=false";
     private String jdbcUsername = "root";
-    private String jdbcPassword = "Hungblo123";
+    private String jdbcPassword = "mikumiku123";
     
     private static final String CREATE_ROOM = "INSERT INTO room " + 
             "(id,numberOfUser,roomname) VALUES " + "(?,?,?)";
