@@ -12,6 +12,7 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
+import Common.Common;
 import model.MessageRoom;
 import model.Room;
 
@@ -20,9 +21,9 @@ import model.Room;
  * @author asus
  */
 public class RoomDAO {
-    private String jdbcUrl = "jdbc:mysql://localhost:3306/chat?useSSL=false";
-    private String jdbcUsername = "root";
-    private String jdbcPassword = "mikumiku123";
+	private String jdbcURL = Common.jdbcUrl;
+    private String jdbcUsername = Common.jdbcUsername;
+    private String jdbcPassword = Common.jdbcPassword;
     
     private static final String CREATE_ROOM = "INSERT INTO room " + 
             "(id,numberOfUser,roomname) VALUES " + "(?,?,?)";
@@ -33,6 +34,8 @@ public class RoomDAO {
     					"inner join user on roomconnection.userid = user.id "+
     					"where roomconnection.roomid = ?";
     private static final String SELECT_ROOM_BY_NAME = "SELECT * FROM room WHERE roomName = ?";
+    private static final String GET_LIST_ROOMID = "Select roomid from roomconnection where userID = ?";
+    private static final String GET_ALL_ROOM = "Select id,numberOfUser,roomName from room";
     private static final String SELECT_ROOM_BY_userID = "select room.* from roomconnection "+
     							"inner join room on roomconnection.roomid = room.id "+
     							"where roomconnection.userid = ?";
@@ -55,12 +58,58 @@ public class RoomDAO {
         Connection c = null;
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            c = DriverManager.getConnection(jdbcUrl, jdbcUsername, jdbcPassword);
+            c = DriverManager.getConnection(jdbcURL, jdbcUsername, jdbcPassword);
             
         } catch (Exception e) {
             System.out.println(e);
         }
         return c;
+    }
+    
+    public List<String> getListRoomID(int userID){
+    	List<String> list = new ArrayList<String>();
+    	
+    	try (Connection c = getConnection();
+                PreparedStatement prepare = c.prepareStatement(GET_LIST_ROOMID)) {
+            
+    		prepare.setInt(1,userID);
+    		ResultSet rs = prepare.executeQuery();
+    		while(rs.next()) {
+    			list.add(rs.getString("roomID"));
+    		}
+            
+            c.close();
+            prepare.close();
+            
+        } catch (Exception e) {
+        	System.out.println(e);
+        }
+    	
+    	return list;
+    }
+    
+    public List<Room> getAllRoom(){
+    	List<Room> list = new ArrayList<Room>();
+    	
+    	try (Connection c = getConnection();
+                PreparedStatement prepare = c.prepareStatement(GET_ALL_ROOM)) {
+            
+    		ResultSet rs = prepare.executeQuery();
+    		while(rs.next()) {
+    			String idRoom = rs.getString("id");
+    			String nameRoom = rs.getString("roomName");
+    			int countPeople = rs.getInt("numberofuser");
+    			Room r = new Room(idRoom, nameRoom, countPeople);
+    			list.add(r);
+    		}
+            
+            c.close();
+            prepare.close();
+            
+        } catch (Exception e) {
+        	System.out.println(e);
+        }
+    	return list;
     }
     
     public int InsertMess(String roomID, int userID, String content) {
@@ -76,6 +125,7 @@ public class RoomDAO {
             prepare.close();
             
         } catch (Exception e) {
+        	System.out.println(e);
         }
         return s;
     }

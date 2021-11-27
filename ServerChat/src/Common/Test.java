@@ -10,8 +10,9 @@ import model.Room;
 public class Test {
 	public static void main(String[] args) {
 		RoomDAO roomDAO = new RoomDAO();
-		 for(Room room:roomDAO.getRoomByUserID(1)) {
-			 System.out.println();
+		 List<Room> list = roomDAO.getAllRoom();
+		 for(Room i:list) {
+			 System.out.println(i.toString());
 		 }
 	}
 }
