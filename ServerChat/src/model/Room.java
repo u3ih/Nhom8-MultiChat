@@ -24,6 +24,11 @@ public class Room {
     	this.countPeople = countPeople;
     	this.lastMess = lastMess;
     }
+    public Room(String idRoom, String nameRoom, int countPeople) {
+    	this.idRoom = idRoom;
+    	this.nameRoom = nameRoom;
+    	this.countPeople = countPeople;
+    }
     public Room() {}
     
 	public String getIdRoom() {
