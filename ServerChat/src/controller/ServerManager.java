@@ -495,7 +495,8 @@ public class ServerManager extends Observable
             case ActionType.Get_User_Info_byName:
             {
             	String name = lines[1];
-            	ArrayList<User> users=controlUser.selectUsersbyName(name);
+            	String uname= lines[2];
+            	ArrayList<User> users=controlUser.selectUsersbyName(name,uname);
             	String res = "";
             	for(int i=0;i<users.size();i++) {
             		String id =Integer.toString(users.get(i).getId());
@@ -513,7 +514,18 @@ public class ServerManager extends Observable
             	String id = lines[1];
             	int a= Integer.parseInt(id);
             	String uname = lines[2];
-            	boolean check = false;
+            	int uid=controlUser.selectIDbyuname(uname);
+            	ArrayList<User> listFriendID=controlUser.selectFriendbyId(uid);
+            	boolean test = true;
+            	for(int i=0;i<listFriendID.size();i++) {
+            		if(a == listFriendID.get(i).getId())	test=false;
+            	}
+            	if(test == false) {
+            		String s="error";
+            		user.Send(actionType, ResultCode.OK, s);
+            	}
+            	else {
+            		boolean check = false;
 				try {
 					check=controlUser.insertUserconnection(a,uname);
 					
@@ -522,12 +534,14 @@ public class ServerManager extends Observable
 					e.printStackTrace();
 				}
 				if(check) {
-					User user1 = controlUser.selectUser(a);
-					String res=user1.getFirstName()+";"+user1.getMidName()+";"+user1.getLastName()+";"+user1.getBirthDay()+";"+Integer.toString(user1.getAge())+";"+user1.getGender();
+					User user1 = controlUser.selectAllInfoAUserByID(a);
+					String res=user1.getFirstName()+";"+user1.getMidName()+";"+user1.getLastName()+";"+user1.getBirthDay()+";"+Integer.toString(user1.getAge())+";"+user1.getGender()+";"+user1.isOnline();
             		user.Send(actionType, ResultCode.OK, res);
             		mListFriend.add(user1);
             	}
             	else	user.Send(actionType, ResultCode.ERROR, "thất bại");
+            	}
+            	
             	notifyObservers(uname+" ket ban ");
             	break;
             }
@@ -541,7 +555,7 @@ public class ServerManager extends Observable
             	List<User> list = controlUser.selectFriendbyId(id);
 //               
             	//List<Room> list = roomDAO.getRoomByUserID(user.getId());//query cÃ³ dáº¡ng actionType;
-                int size = list.size();
+                int size = list.size();       
                 if(size>0)
                 {
                 	for(User u:list) {

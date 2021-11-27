@@ -366,9 +366,9 @@ public class ClientManager extends Observable{
 				notifyObservers(result);
 			}
     }
-    public void getinfobyName(String name) 
+    public void getinfobyName(String name,String uname) 
     {
-    		String line = ActionType.Get_User_Info_byName +";"+name;
+    		String line = ActionType.Get_User_Info_byName +";"+name+";"+uname;
     		try {
 				mBufferWriter.write(line+"\n");
 				mBufferWriter.flush();

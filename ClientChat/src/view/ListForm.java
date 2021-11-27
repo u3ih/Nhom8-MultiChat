@@ -78,7 +78,7 @@ public class ListForm extends javax.swing.JFrame implements Observer {
 
         jButton2.setText("jButton2");
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         addWindowListener(new java.awt.event.WindowAdapter() {
         	public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
@@ -225,6 +225,7 @@ public class ListForm extends javax.swing.JFrame implements Observer {
     protected void formWindowClosing(WindowEvent evt) {
 		// TODO Auto-generated method stub
     	mclientManager.Logout();
+    	mclientManager.Dispose();
 	}
 
 	private void btnLogoutActionPerformed(ActionEvent e) {

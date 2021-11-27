@@ -28,6 +28,7 @@ import javax.swing.JTable;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.JButton;
+import javax.swing.JTextField;
 
 /**
  *
@@ -117,7 +118,7 @@ public class friendAddForm extends javax.swing.JFrame implements Observer{
         			.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 405, GroupLayout.PREFERRED_SIZE)
         			.addGap(25))
         		.addGroup(layout.createSequentialGroup()
-        			.addContainerGap(294, Short.MAX_VALUE)
+        			.addContainerGap(312, Short.MAX_VALUE)
         			.addComponent(btnNewButton)
         			.addGap(73))
         );
@@ -156,7 +157,7 @@ public class friendAddForm extends javax.swing.JFrame implements Observer{
 		// TODO Auto-generated method stub
     	String name=jTextField1.getText();
     	dtm.setRowCount(0);
-    	mCLientManager.getinfobyName(name);
+    	mCLientManager.getinfobyName(name,mCLientManager.mNickname);
 	}
     protected void btnketban(ActionEvent e) {
     	int slt= table.getSelectedRow();
@@ -196,17 +197,23 @@ public class friendAddForm extends javax.swing.JFrame implements Observer{
     	case ActionType.Ket_Ban:
         {
         	if(result.mResultCode.equals(ResultCode.OK)) {
-    			JOptionPane.showMessageDialog(null, "Kết bạn thành công", "ThÃ nh cÃ´ng", JOptionPane.INFORMATION_MESSAGE);
-    			String[] infos=result.mContent.split(";");
-    			User u = new User();
-    			u.setFirstName(infos[0]);
-    			u.setMidName(infos[1]);
-    			u.setLastName(infos[2]);
-    			u.setBirthDay(infos[3]);
-    			u.setAge(Integer.parseInt(infos[4]));
-    			u.setGender(infos[5]);
-    			u.setOnline(Boolean.parseBoolean(infos[6]));
-    			p.setListModel(u);
+        		if(result.mContent.equals("error")) {
+        			JOptionPane.showMessageDialog(null, "Đã kết bạn với người dùng này", "Thất bại", JOptionPane.ERROR_MESSAGE);
+        		}
+        		else {
+        			JOptionPane.showMessageDialog(null, "Kết bạn thành công", "ThÃ nh cÃ´ng", JOptionPane.INFORMATION_MESSAGE);
+        			String[] infos=result.mContent.split(";");
+        			User u = new User();
+        			u.setFirstName(infos[0]);
+        			u.setMidName(infos[1]);
+        			u.setLastName(infos[2]);
+        			u.setBirthDay(infos[3]);
+        			u.setAge(Integer.parseInt(infos[4]));
+        			u.setGender(infos[5]);
+        			u.setOnline(Boolean.parseBoolean(infos[6]));
+        			p.setListModel(u);
+        		}
+    			
     		}
     		else
     		{
