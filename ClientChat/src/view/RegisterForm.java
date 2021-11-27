@@ -102,7 +102,7 @@ public class RegisterForm extends javax.swing.JFrame implements Observer{
         jLabel3.setText("Password");
 
         jButton1.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
-        jButton1.setText("H\u1EE7y");
+        jButton1.setText("Quay lại");
 
         jLabel4.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
         jLabel4.setText("Ng\u00E0y sinh");
