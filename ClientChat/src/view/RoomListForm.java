@@ -171,7 +171,7 @@ public class RoomListForm extends javax.swing.JPanel implements Observer {
                 		Room r = listRoomModel.elementAt(i);
                 		r.setLastMess(sender +": "+ messContent);
                 		System.out.println(r.toString());
-//                		listRoomModel.remove(i);
+                		listRoomModel.remove(i);
                 		listRoomModel.addElement(r);
                 		return;
                 	}

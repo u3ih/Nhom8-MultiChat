@@ -323,10 +323,6 @@ public class ListForm extends javax.swing.JFrame implements Observer {
                 //r.setListModel(new Room(findIDRoom,lines[0],Integer.parseInt(lines[1])));
                 break;
            }
-            case ActionType.Close_WINDOW_CHAT:
-            {
-            	if (listThread.containsKey(result.mContent)) listThread.remove(result.mContent);
-            }
             case ActionType.CALL_ONLINE:
             {
             	String[] lines = result.mContent.split(";", -1);
@@ -342,6 +338,12 @@ public class ListForm extends javax.swing.JFrame implements Observer {
             	p.checkFriend(u);
             	break;
             }
+            case ActionType.Close_WINDOW_CHAT:
+            {
+            	if (listThread.containsKey(result.mContent)) listThread.remove(result.mContent);
+            	break;
+            }
+            
 //            case ActionType.GET_LIST_FRIEND:
 //            {
 //            	textField.setText(result.mContent);

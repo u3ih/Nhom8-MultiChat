@@ -135,14 +135,16 @@ public class UserFriendListElement extends javax.swing.JPanel implements ListCel
 	public Component getListCellRendererComponent(JList<? extends User> list, User value, int index, boolean isSelected,
 			boolean cellHasFocus) {
 		// TODO Auto-generated method stub
-		this.jLabel2.setText(value.getFirstName()+" "+ value.getMidName()+" "+value.getLastName());
-		this.jLabel3.setText("Gender :"+value.getGender());
-		this.lblNewLabel.setText("Age :"+value.getAge()+"");
-		if(value.isOnline()==true) {
-			this.lblNewLabel_1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Image/icons8-green-circle-48.png")));
-		}else {
-			this.lblNewLabel_1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Image/icons8-red-circle-48.png")));
-		}	
+		if(value != null) {
+			this.jLabel2.setText(value.getFirstName()+" "+ value.getMidName()+" "+value.getLastName());
+			this.jLabel3.setText("Gender :"+value.getGender());
+			this.lblNewLabel.setText("Age :"+value.getAge()+"");
+			if(value.isOnline()==true) {
+				this.lblNewLabel_1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Image/icons8-green-circle-48.png")));
+			}else {
+				this.lblNewLabel_1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Image/icons8-red-circle-48.png")));
+			}	
+		}
 		return this;
 	}
 }
