@@ -69,7 +69,9 @@ public class RoomListForm extends javax.swing.JPanel implements Observer {
 	   System.out.println(result.mContent.length());
     if(result.mContent.length()>0 || result.mContent != "")
     {
-        listRoomModel.clear();
+        for(int i=0;i<listRoomModel.getSize();i++) {
+        	listRoomModel.remove(i);
+        }
         String[] rows = result.mContent.split("<row>");
         for (int i = 0; i < rows.length; i++) //hàng đầu là trống
         {
