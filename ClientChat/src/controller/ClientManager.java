@@ -201,16 +201,16 @@ public class ClientManager extends Observable{
         	mDataOutputStream.writeUTF(Pass);
         	mDataOutputStream.writeUTF(gender);
         	
-        	String res = mDataInputStream.readUTF();
-            if(res.equals("ERROR")) {
-            	Result result = new Result("", ResultCode.ERROR, "Lỗi đăng ký");
-                notifyObservers(result);
-                return false;
-            } else if(res.equals("OK")) {
-            	Result result = new Result("", ResultCode.OK, "Đăng ký thành công");
-                notifyObservers(result);
-                return true;
-            }
+//        	String res = mDataInputStream.readUTF();
+//            if(res.equals("ERROR")) {
+//            	Result result = new Result("", ResultCode.ERROR, "Lỗi đăng ký");
+//                notifyObservers(result);
+//                return false;
+//            } else if(res.equals("OK")) {
+//            	Result result = new Result("", ResultCode.OK, "Đăng ký thành công");
+//                notifyObservers(result);
+//                return true;
+//            }
         } catch (IOException ex) {
             Result result = new Result("", ResultCode.ERROR, "Không thể kết nối tới server");
             notifyObservers(result);
