@@ -175,6 +175,7 @@ public class RoomListForm extends javax.swing.JPanel implements Observer {
                 		System.out.println(r.toString());
                 		listRoomModel.remove(i);
                 		listRoomModel.addElement(r);
+                		
                 		return;
                 	}
                 }
