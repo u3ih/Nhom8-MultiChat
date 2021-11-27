@@ -308,7 +308,7 @@ public class ListForm extends javax.swing.JFrame implements Observer {
                 newThreadRoom.run();;
                 listThread.put(lines[0], newThreadRoom);
                 r.setListModel(new Room(lines[0],createNameRoom,1,"null"));
-                mclientManager.GetListRoom();
+//              mclientManager.GetListRoom();
                 break;
             }
             case ActionType.JOIN_ROOM:

@@ -109,7 +109,7 @@ public class ServerManager extends Observable
             					UserDAO ud = new UserDAO();
             					ud.insertUser(uss);;
             					mDataOutputStream.writeUTF("OK");
-            					mListUser.put(Uname, uss);
+            					mListUser = controlUser.selectAllUsers();
             				} catch (IOException | SQLException e) {
             					mDataOutputStream.writeUTF("ERROR");
             				} 
