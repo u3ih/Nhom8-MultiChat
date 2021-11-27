@@ -400,5 +400,15 @@ public class ClientManager extends Observable{
 			notifyObservers(result);
 		}
     }
-    
+    public void callOffline(String uname) {
+    	String line = ActionType.CALL_OFFLINE+";"+uname;
+    	try {
+			mBufferWriter.write(line+"\n");
+			mBufferWriter.flush();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			Result result = new Result("", ResultCode.ERROR, "Kết nối tới server có lỗi");
+			notifyObservers(result);
+		}
+    }
 }

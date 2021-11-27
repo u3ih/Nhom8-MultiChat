@@ -24,4 +24,5 @@ public class ActionType {
     public static final String GET_LIST_FRIEND = "20";
     public static final String GET_Online = "21";
     public static final String 	CALL_ONLINE = "call";
+    public static final String 	CALL_OFFLINE = "calloff";
 }

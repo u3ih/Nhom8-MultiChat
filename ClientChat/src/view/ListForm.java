@@ -224,6 +224,7 @@ public class ListForm extends javax.swing.JFrame implements Observer {
     }// </editor-fold>//GEN-END:initComponents
     protected void formWindowClosing(WindowEvent evt) {
 		// TODO Auto-generated method stub
+    	mclientManager.callOffline(mclientManager.mNickname);
     	mclientManager.Logout();
     	mclientManager.Dispose();
 	}
