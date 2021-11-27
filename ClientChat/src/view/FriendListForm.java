@@ -57,8 +57,22 @@ public class FriendListForm extends javax.swing.JPanel implements Observer{
 //			}
 //		});
     }
-    public void setListModel(User user) {
-    	listUserFriendModel.addElement(user);
+    public void checkFriend(User user) {
+    	int tmp=-1;
+    	for(int i=0;i<listUserFriendModel.size();i++) {
+    		if(listUserFriendModel.get(i).getId() == user.getId()) {
+    			tmp=i;
+    		}
+    		
+    	}
+    	if(tmp != -1) {
+    		user.setOnline(true);
+    		listUserFriendModel.set(tmp, user);
+    	}
+    	
+    }
+    public void setListModel(User u) {
+    	listUserFriendModel.addElement(u);
     }
     public void initList(Result result) {
         
@@ -72,7 +86,7 @@ public class FriendListForm extends javax.swing.JPanel implements Observer{
             {
                 String[] cols = rows[i].split("<col>");
                // listUserFriendModel.addElement(new Room(cols[0],cols[1],Integer.parseInt(cols[2])));
-                listUserFriendModel.addElement(new User(cols[0],cols[1],cols[2],cols[3],Integer.parseInt(cols[4]),cols[5],Boolean.parseBoolean(cols[6])));
+                listUserFriendModel.addElement(new User(Integer.parseInt(cols[7]),cols[0],cols[1],cols[2],cols[3],Integer.parseInt(cols[4]),cols[5],Boolean.parseBoolean(cols[6])));
             }
         }
     	

@@ -201,16 +201,16 @@ public class ClientManager extends Observable{
         	mDataOutputStream.writeUTF(Pass);
         	mDataOutputStream.writeUTF(gender);
         	
-        	String res = mDataInputStream.readUTF();
-            if(res.equals("ERROR")) {
-            	Result result = new Result("", ResultCode.ERROR, "Lỗi đăng ký");
-                notifyObservers(result);
-                return false;
-            } else if(res.equals("OK")) {
-            	Result result = new Result("", ResultCode.OK, "Đăng ký thành công");
-                notifyObservers(result);
-                return true;
-            }
+//        	String res = mDataInputStream.readUTF();
+//            if(res.equals("ERROR")) {
+//            	Result result = new Result("", ResultCode.ERROR, "Lỗi đăng ký");
+//                notifyObservers(result);
+//                return false;
+//            } else if(res.equals("OK")) {
+//            	Result result = new Result("", ResultCode.OK, "Đăng ký thành công");
+//                notifyObservers(result);
+//                return true;
+//            }
         } catch (IOException ex) {
             Result result = new Result("", ResultCode.ERROR, "Không thể kết nối tới server");
             notifyObservers(result);
@@ -366,9 +366,9 @@ public class ClientManager extends Observable{
 				notifyObservers(result);
 			}
     }
-    public void getinfobyName(String name) 
+    public void getinfobyName(String name,String uname) 
     {
-    		String line = ActionType.Get_User_Info_byName +";"+name;
+    		String line = ActionType.Get_User_Info_byName +";"+name+";"+uname;
     		try {
 				mBufferWriter.write(line+"\n");
 				mBufferWriter.flush();
@@ -389,6 +389,16 @@ public class ClientManager extends Observable{
 			notifyObservers(result);
 		}
     }
-    
+    public void callOnline(String uname) {
+    	String line = ActionType.CALL_ONLINE+";"+uname;
+    	try {
+			mBufferWriter.write(line+"\n");
+			mBufferWriter.flush();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			Result result = new Result("", ResultCode.ERROR, "Kết nối tới server có lỗi");
+			notifyObservers(result);
+		}
+    }
     
 }

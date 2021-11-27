@@ -31,11 +31,12 @@ public class UserDAO {
     private static final String SELECT_FRIENDUSER_BY_ID = "SELECT * FROM chat.userconnection inner join chat.user on user.id=userconnection.userID2 where userID1=?";
     
     private static final String SELECT_ID_BY_UNAME = "select id from user where username =  ?";
-    private static final String SELECT_USER_BY_NAME = "select id,firstName,midName,lastName,birthDay,age,gender from user where lastName=?";
+    private static final String SELECT_USER_BY_NAME = "select id,firstName,midName,lastName,birthDay,age,gender from user where lastName=? and username not like ?";
     private static final String INSERT_USERCONNECTION_SQL = "INSERT INTO userconnection" + " (userID1,userID2) VALUES " +" (?, ?);";
     private static final String SELECT_ID_FRIEND =" select userID2 from userconnection where userID1 =?";
     private static final String UPDATE_USER_ONLINE = "update user set isOnline = ? where username = ?";
     private static final String SELECT_isOnline_BY_UNAME = "select isOnline from user where username =  ?";
+    private static final String SELECT_A_USER_BY_ID="Select * from user where id=?;";
     public UserDAO() {
     }
 
@@ -225,7 +226,7 @@ public class UserDAO {
             // Step 3: Execute the query or update query
             ResultSet rs = preparedStatement.executeQuery();
             while (rs.next()) {
-            	int id= rs.getInt("id");
+            	int id= rs.getInt("userid2");
                 String firstName = rs.getString("firstName");
                 String midName = rs.getString("midName");
                 String lastName = rs.getString("lastName");
@@ -242,7 +243,7 @@ public class UserDAO {
         return users;
     }
     
-    public ArrayList<User> selectUsersbyName(String name) {
+    public ArrayList<User> selectUsersbyName(String name,String uname) {
         // using try-with-resources to avoid closing resources (boiler plate code)
     	ArrayList<User> users = new ArrayList<>();
     	
@@ -254,6 +255,7 @@ public class UserDAO {
                 PreparedStatement preparedStatement
                 = connection.prepareStatement(SELECT_USER_BY_NAME);) {       	
         		preparedStatement.setString(1, name);
+        		preparedStatement.setString(2, uname);
             System.out.println(preparedStatement);
             // Step 3: Execute the query or update query
             ResultSet rs = preparedStatement.executeQuery();
@@ -316,13 +318,17 @@ public class UserDAO {
     	boolean rowUpdated=false;
         try (Connection connection = getConnection(); 
                 PreparedStatement statement
+                = connection.prepareStatement(INSERT_USERCONNECTION_SQL);
+                PreparedStatement statement1
                 = connection.prepareStatement(INSERT_USERCONNECTION_SQL)) {
             int userID2= selectIDbyuname(uname);
             statement.setInt(1, userID2);
             statement.setInt(2, userID1);
             
            rowUpdated = statement.executeUpdate() > 0;
-           
+           statement1.setInt(1, userID1);
+           statement1.setInt(2, userID2);
+           statement1.executeUpdate();
         } catch (Exception e){
          System.out.println(e);
       }
@@ -366,5 +372,32 @@ public class UserDAO {
     	 statement.executeUpdate();
     	}
     	//return rUpdated;
+    }
+    public User selectAllInfoAUserByID(int id) {
+    	User user = null;
+        // Step 1: Establishing a Connection
+        try (Connection connection = getConnection();
+                // Step 2:Create a statement using connection object
+                PreparedStatement preparedStatement
+                = connection.prepareStatement(SELECT_A_USER_BY_ID);) {
+            preparedStatement.setInt(1, id);
+            System.out.println(preparedStatement);
+            // Step 3: Execute the query or update query
+            ResultSet rs = preparedStatement.executeQuery();
+            // Step 4: Process the ResultSet object.
+             if(rs.next()) {
+                String firstName = rs.getString("firstName");
+                String midName = rs.getString("midName");
+                String lastName = rs.getString("lastName");
+                String birthDay = rs.getString("birthDay");
+                int age = rs.getInt("age");
+                String gender = rs.getString("gender");
+                boolean isOnline = rs.getBoolean("isOnline");
+                user = new User(id,firstName, midName, lastName, birthDay, age, gender,isOnline);
+            }
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+        return user;
     }
 }
