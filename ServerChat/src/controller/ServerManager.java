@@ -201,7 +201,22 @@ public class ServerManager extends Observable
                 	file = user.ReadFile();
                 	System.out.println("file: " + file.getName());
                 	ProcessSendFile(user, roomID, file);
-                } else {
+                } else if(actionType.equals(ActionType.CALL_ONLINE)) {
+                	String uname=lines[1];
+                	for(int j=0;j<size;j++) {
+                		if(j!=i) {
+                			User usersk=mListUserOnline.get(j);
+                			int uid=controlUser.selectIDbyuname(uname);
+                			User user1 = controlUser.selectAllInfoAUserByID(uid);
+                			user1.setOnline(false);
+        					String res=user1.getFirstName()+";"+user1.getMidName()+";"+user1.getLastName()+";"+user1.getBirthDay()+";"+Integer.toString(user1.getAge())+";"+user1.getGender()+";"+user1.isOnline()+";"+user1.getId();
+                    		usersk.Send(actionType, ResultCode.OK, res);
+                    		notifyObservers(res);
+                		}
+                	}
+                }
+                else 
+                {
                 	ProcessRequest(user, request);
                 }
             }
@@ -535,7 +550,7 @@ public class ServerManager extends Observable
 				}
 				if(check) {
 					User user1 = controlUser.selectAllInfoAUserByID(a);
-					String res=user1.getFirstName()+";"+user1.getMidName()+";"+user1.getLastName()+";"+user1.getBirthDay()+";"+Integer.toString(user1.getAge())+";"+user1.getGender()+";"+user1.isOnline();
+					String res=user1.getFirstName()+";"+user1.getMidName()+";"+user1.getLastName()+";"+user1.getBirthDay()+";"+Integer.toString(user1.getAge())+";"+user1.getGender()+";"+user1.isOnline()+";"+user1.getId();
             		user.Send(actionType, ResultCode.OK, res);
             		mListFriend.add(user1);
             	}
@@ -564,7 +579,7 @@ public class ServerManager extends Observable
                 	String listFriend = "";
                 	for(User u:list) {
                      listFriend += u.getFirstName() +"<col>" +u.getMidName()+"<col>" +u.getLastName()+"<col>" 
-                	+u.getBirthDay()+"<col>" +u.getAge()+"<col>" +u.getGender()+"<col>"+u.isOnline()+ "<row>";    
+                	+u.getBirthDay()+"<col>" +u.getAge()+"<col>" +u.getGender()+"<col>"+u.isOnline()+"<col>"+u.getId()+ "<row>";    
                     }
                     System.out.print(listFriend);
                     user.Send(actionType, ResultCode.OK, listFriend);

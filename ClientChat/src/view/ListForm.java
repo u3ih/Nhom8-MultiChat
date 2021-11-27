@@ -193,7 +193,7 @@ public class ListForm extends javax.swing.JFrame implements Observer {
         			.addComponent(jButton1)
         			.addGap(93)
         			.addComponent(btnNewButton, GroupLayout.PREFERRED_SIZE, 87, GroupLayout.PREFERRED_SIZE)
-        			.addPreferredGap(ComponentPlacement.RELATED, 47, Short.MAX_VALUE)
+        			.addPreferredGap(ComponentPlacement.RELATED, 53, Short.MAX_VALUE)
         			.addComponent(btnLogout)
         			.addGap(21))
         );
@@ -244,6 +244,7 @@ public class ListForm extends javax.swing.JFrame implements Observer {
 
 	protected void formWindowOpened(WindowEvent evt) {
 		jLabel6.setText(mclientManager.mNickname);
+		mclientManager.callOnline(mclientManager.mNickname);
 //		mclientManager.GetListFriend(mclientManager.mNickname);
 	}
 
@@ -325,6 +326,21 @@ public class ListForm extends javax.swing.JFrame implements Observer {
             case ActionType.Close_WINDOW_CHAT:
             {
             	if (listThread.containsKey(result.mContent)) listThread.remove(result.mContent);
+            }
+            case ActionType.CALL_ONLINE:
+            {
+            	String[] lines = result.mContent.split(";", -1);
+            	User u= new User();
+            	u.setFirstName(lines[0]);
+            	u.setMidName(lines[1]);
+            	u.setLastName(lines[2]);
+            	u.setBirthDay(lines[3]);
+            	u.setAge(Integer.parseInt(lines[4]));
+            	u.setGender(lines[5]);
+            	u.setOnline(Boolean.parseBoolean(lines[6]));
+            	u.setId(Integer.parseInt(lines[7]));
+            	p.checkFriend(u);
+            	break;
             }
 //            case ActionType.GET_LIST_FRIEND:
 //            {

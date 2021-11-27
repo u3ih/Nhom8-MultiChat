@@ -318,13 +318,17 @@ public class UserDAO {
     	boolean rowUpdated=false;
         try (Connection connection = getConnection(); 
                 PreparedStatement statement
+                = connection.prepareStatement(INSERT_USERCONNECTION_SQL);
+                PreparedStatement statement1
                 = connection.prepareStatement(INSERT_USERCONNECTION_SQL)) {
             int userID2= selectIDbyuname(uname);
             statement.setInt(1, userID2);
             statement.setInt(2, userID1);
             
            rowUpdated = statement.executeUpdate() > 0;
-           
+           statement1.setInt(1, userID1);
+           statement1.setInt(2, userID2);
+           statement1.executeUpdate();
         } catch (Exception e){
          System.out.println(e);
       }
@@ -389,7 +393,7 @@ public class UserDAO {
                 int age = rs.getInt("age");
                 String gender = rs.getString("gender");
                 boolean isOnline = rs.getBoolean("isOnline");
-                user = new User(firstName, midName, lastName, birthDay, age, gender,isOnline);
+                user = new User(id,firstName, midName, lastName, birthDay, age, gender,isOnline);
             }
         } catch (SQLException e) {
             System.out.println(e);

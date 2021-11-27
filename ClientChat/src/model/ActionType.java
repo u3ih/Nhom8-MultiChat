@@ -23,4 +23,5 @@ public class ActionType {
     public static final String Ket_Ban = "19";
     public static final String GET_LIST_FRIEND = "20"; 
     public static final String GET_Online = "21";
+    public static final String 	CALL_ONLINE = "call";
 }

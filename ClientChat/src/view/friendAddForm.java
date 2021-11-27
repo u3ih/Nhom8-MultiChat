@@ -211,7 +211,8 @@ public class friendAddForm extends javax.swing.JFrame implements Observer{
         			u.setAge(Integer.parseInt(infos[4]));
         			u.setGender(infos[5]);
         			u.setOnline(Boolean.parseBoolean(infos[6]));
-        			p.setListModel(u);
+        			u.setId(Integer.parseInt(infos[7]));
+        			p.setListModel(u);;
         		}
     			
     		}
