@@ -466,4 +466,15 @@ public class ClientManager extends Observable{
 			notifyObservers(result);
 		}
     }
+    public void callDisplayFriend(int userID, String uname) {
+    	String line = ActionType.CALL_DISPLAY_FRIEND + ";"+ userID+";"+uname;
+    	try {
+			mBufferWriter.write(line+"\n");
+			mBufferWriter.flush();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			Result result = new Result("", ResultCode.ERROR, "Kết nối tới server có lỗi");
+			notifyObservers(result);
+		}
+    }
 }

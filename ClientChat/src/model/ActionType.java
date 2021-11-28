@@ -29,4 +29,5 @@ public class ActionType {
     public static final String SEND_FILE_FRIEND = "send_file_fiend";
     public static final String GET_ROOM_BY_ID = "get_room_by_id";
     public static final String GET_MESS_BOX = "get_mess_box";
+    public static final String 	CALL_DISPLAY_FRIEND = "callDisplayFriend";
 }

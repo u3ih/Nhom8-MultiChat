@@ -385,6 +385,26 @@ public class ListForm extends javax.swing.JFrame implements Observer {
             	p.setOfflineFriend(u);
             	break;
             }
+            case ActionType.CALL_DISPLAY_FRIEND:
+        	{
+        		String[] lines = result.mContent.split(";");
+            	User u= new User();
+            	u.setFirstName(lines[0]);
+            	u.setMidName(lines[1]);
+            	u.setLastName(lines[2]);
+            	u.setBirthDay(lines[3]);
+            	u.setAge(Integer.parseInt(lines[4]));
+            	u.setGender(lines[5]);
+            	u.setOnline(Boolean.parseBoolean(lines[6]));
+            	u.setId(Integer.parseInt(lines[7]));
+            	u.setUsername(lines[8]);
+    			
+    			ThreadNewFriend newThreadFriend = new ThreadNewFriend(new ChatForm(mclientManager, lines[8]));
+                
+    			p.setListModel(u);
+    			listThreadFriend.put(lines[8], newThreadFriend);
+            	break;
+        	}
             case ActionType.Close_WINDOW_CHAT:
             {
             	if (listThread.containsKey(result.mContent)) listThread.remove(result.mContent);

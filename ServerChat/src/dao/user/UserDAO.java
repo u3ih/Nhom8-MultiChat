@@ -404,4 +404,24 @@ public class UserDAO {
         }
         return user;
     }
+    public String selectUnameByID(int id) {
+    	String uname = "";
+        // Step 1: Establishing a Connection
+        try (Connection connection = getConnection();
+                // Step 2:Create a statement using connection object
+                PreparedStatement preparedStatement
+                = connection.prepareStatement(SELECT_A_USER_BY_ID);) {
+            preparedStatement.setInt(1, id);
+            System.out.println(preparedStatement);
+            // Step 3: Execute the query or update query
+            ResultSet rs = preparedStatement.executeQuery();
+            // Step 4: Process the ResultSet object.
+             if(rs.next()) {
+                uname=rs.getString("username");
+            }
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+        return uname;
+    }
 }

@@ -236,6 +236,48 @@ public class ServerManager extends Observable
                 		}
                 	}
                 }
+                else if(actionType.equals(ActionType.CALL_OFFLINE)) {
+                	String uname=lines[1];
+                	for(int j=0;j<size;j++) {
+                		if(j!=i) {
+                			User usersk=mListUserOnline.get(j);
+                			int uid=controlUser.selectIDbyuname(uname);
+                			User user1 = controlUser.selectAllInfoAUserByID(uid);
+                			user1.setOnline(true);
+        					String res=user1.getFirstName()+";"+user1.getMidName()+";"+user1.getLastName()+";"+user1.getBirthDay()+";"+Integer.toString(user1.getAge())+";"+user1.getGender()+";"+user1.isOnline()+";"+user1.getId();
+                    		usersk.Send(actionType, ResultCode.OK, res);
+                    		notifyObservers(res);
+                		}
+                	}
+                }
+                else if(actionType.equals(ActionType.CALL_DISPLAY_FRIEND)) {
+                	String id = lines[1];
+                	int a= Integer.parseInt(id);
+                	String uname = lines[2];
+                	int uid=controlUser.selectIDbyuname(uname);
+                	String friendUname=controlUser.selectUnameByID(a);
+                	ArrayList<User> listFriendID=controlUser.selectFriendbyId(uid);
+                	boolean test = true;
+                	for(int j=0;j<listFriendID.size();j++) {
+                		if(a == listFriendID.get(j).getId()) {
+                			test=false;
+                		}
+                	}
+                	if(test == true) {
+                		for(int j=0;j<size;j++) {
+                		if(mListUserOnline.get(j).getUsername().equals(friendUname)) {
+                			User usersk=mListUserOnline.get(j);
+                			User user1 = controlUser.selectAllInfoAUserByID(uid);
+                			user1.setOnline(true);
+        					String res=user1.getFirstName()+";"+user1.getMidName()+";"+user1.getLastName()+";"+user1.getBirthDay()+";"+Integer.toString(user1.getAge())+";"+user1.getGender()+";"+user1.isOnline()+";"+user1.getId()+";"+user1.getUsername();
+                    		notifyObservers(uname+"gọi bạn bè hiển thị");
+                    		usersk.Send(actionType, ResultCode.OK, res);
+                    		
+                		}
+                	}
+                	}
+                	
+                }
                 else 
                 {
                 	ProcessRequest(user, request);

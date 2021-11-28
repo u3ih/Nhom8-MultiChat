@@ -168,7 +168,11 @@ public class friendAddForm extends javax.swing.JFrame implements Observer{
     	
     	int iduserSelected = Integer.parseInt(dtm.getValueAt(slt, 0).toString());
     	
+    	mCLientManager.callDisplayFriend(iduserSelected, mCLientManager.mNickname);
+    	
     	mCLientManager.ketban(iduserSelected, mCLientManager.mNickname);
+    	
+    	
     	
     }
     @Override
