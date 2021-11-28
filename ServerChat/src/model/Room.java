@@ -134,7 +134,7 @@ public class Room {
             User user = mListUser.get(i);
             if(user!=userJoin)
             {
-                user.Send(ActionType.NOTIFY_JUST_JOIN_ROOM, ResultCode.OK,idRoom +";"+ userJoin.getId());
+                user.Send(ActionType.NOTIFY_JUST_JOIN_ROOM, ResultCode.OK,idRoom +";"+ userJoin.getUsername());
             }
         }
     }
@@ -147,7 +147,7 @@ public class Room {
             User user = mListUser.get(i);
             if(user!=userLeave)
             {
-                user.Send(ActionType.NOTIFY_JUST_LEAVE_ROOM, ResultCode.OK,idRoom +";"+ userLeave.getId());
+                user.Send(ActionType.NOTIFY_JUST_LEAVE_ROOM, ResultCode.OK,idRoom +";"+ userLeave.getUsername());
             }
         }}
     }
