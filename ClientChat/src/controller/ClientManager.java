@@ -258,6 +258,18 @@ public class ClientManager extends Observable{
             notifyObservers(result);
         }
     }
+    
+    public void getMessBox(String username1, String username2) {
+    	String line = ActionType.GET_MESS_BOX + ";" + username1 +";"+username2;
+        try
+        {
+            mBufferWriter.write(line + "\n");
+            mBufferWriter.flush();
+        } catch (IOException ex) {
+            Result result = new Result("", ResultCode.ERROR, "Không thể kết nối tới server");
+            notifyObservers(result);
+        }
+    }
 
     public boolean isSuccessReg(){
     	String s="OK";

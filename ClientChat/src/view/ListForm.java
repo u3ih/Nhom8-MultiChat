@@ -57,10 +57,6 @@ public class ListForm extends javax.swing.JFrame implements Observer {
         this.loginForm = loginForm;
         clientManager.addObserver(this);
     }
-    
-    public void setListThreadFriend(HashMap<String,ThreadNewFriend> listThreadFriend) {
-    	this.listThreadFriend = listThreadFriend;
-    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -124,10 +120,6 @@ public class ListForm extends javax.swing.JFrame implements Observer {
         });
         
         
-        
-        
-        
-        
         tabbedPane = new JTabbedPane(JTabbedPane.TOP);
         
         tabbedPane.addAncestorListener(new AncestorListener() {
@@ -146,7 +138,7 @@ public class ListForm extends javax.swing.JFrame implements Observer {
 			
 			@Override
 			public void ancestorAdded(AncestorEvent event) {
-				 p=new FriendListForm(mclientManager, listThreadFriend);
+				p=new FriendListForm(mclientManager, listThreadFriend);
                 tabbedPane.add(p,"danh sách bạn");
                 r= new RoomListForm(mclientManager,listThread);
                 tabbedPane.add(r,"danh sách phòng");
@@ -245,7 +237,7 @@ public class ListForm extends javax.swing.JFrame implements Observer {
 	}
     protected void btntim(ActionEvent e) {
 		// TODO Auto-generated method stub
-    	friendAddForm faf= new friendAddForm(this, mclientManager,p, listThreadFriend);
+    	friendAddForm faf= new friendAddForm(this, mclientManager,p);
 		faf.setVisible(true);
 	}
 
@@ -348,11 +340,12 @@ public class ListForm extends javax.swing.JFrame implements Observer {
             			u.setGender(infos[5]);
             			u.setOnline(Boolean.parseBoolean(infos[6]));
             			u.setId(Integer.parseInt(infos[7]));
+            			u.setUsername(infos[8]);
             			
             			ThreadNewFriend newThreadFriend = new ThreadNewFriend(new ChatForm(mclientManager, infos[8]));
-            			newThreadFriend.run();
-                        listThreadFriend.put(infos[8], newThreadFriend);
+                        
             			p.setListModel(u);
+            			listThreadFriend.put(infos[8], newThreadFriend);
             		}
         			
         		}

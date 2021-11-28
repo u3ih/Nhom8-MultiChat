@@ -47,14 +47,12 @@ public class friendAddForm extends javax.swing.JFrame implements Observer{
 	ClientManager mCLientManager;
 	ListForm mlistForm;
 	FriendListForm p;
-	private HashMap<String,ThreadNewFriend> listThread = new HashMap<String,ThreadNewFriend>();
-    public friendAddForm(ListForm listform, ClientManager clientmanager,FriendListForm p, HashMap<String,ThreadNewFriend> listThread) {
+    public friendAddForm(ListForm listform, ClientManager clientmanager,FriendListForm p) {
     	initComponents();
     	mlistForm = listform;
     	mCLientManager= clientmanager;
         mCLientManager.addObserver(this);
         this.p=p;
-        this.listThread = listThread;
         dtm = (DefaultTableModel)table.getModel();
     }
 

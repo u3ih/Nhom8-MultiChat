@@ -51,6 +51,10 @@ public class RoomDAO {
             +"from messageroom inner join user " + "on messageroom.userid = user.id "
             +"where roomid = ? order by messageroom.id desc limit 1";
     private static final String INSERT_MESS = "INSERT INTO messageroom (roomID, userID, content) values (?,?,?);";
+    private static final String INSERT_MESS_BOX = "INSERT INTO messagebox (username1, username2, content) values (?,?,?);";
+    private static final String GET_MESS_BY_ROOMBOX = "select username1,content "
+            +"from messagebox " 
+    		+"where (username1 = ? and username2 = ?) or (username2 = ? and username1 = ?) ";
 
     public RoomDAO() {
     }
@@ -130,6 +134,48 @@ public class RoomDAO {
         	System.out.println(e);
         }
         return s;
+    }
+    
+    public int InsertMessBox(String username1, String username2, String content) {
+    	int s = 0;
+        try (Connection c = getConnection();
+                PreparedStatement prepare = c.prepareStatement(INSERT_MESS_BOX)) {
+            
+            prepare.setString(1, username1);
+            prepare.setString(3, content);
+            prepare.setString(2, username2);
+            s = prepare.executeUpdate();
+            c.close();
+            prepare.close();
+            
+        } catch (Exception e) {
+        	System.out.println(e);
+        }
+        return s;
+    }
+    
+    public List<MessageRoom> getMessByRoomBox(String username1,String username2){
+        List<MessageRoom> list = new ArrayList<>();
+            
+        try (Connection c = getConnection();
+                PreparedStatement prepare = c.prepareStatement(GET_MESS_BY_ROOMBOX)) {
+        	
+            prepare.setString(1, username1);
+            prepare.setString(2, username2);
+            
+            prepare.setString(3, username1);
+            prepare.setString(4, username2);
+            ResultSet rs = prepare.executeQuery();
+            while(rs.next()){
+                list.add(new MessageRoom(rs.getString("username1"),rs.getString("content")));
+            }
+            c.close();
+            prepare.close();
+            
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return list;
     }
     
     public List<MessageRoom> getMessByRoomID(String roomID){

@@ -46,7 +46,6 @@ public class FriendListForm extends javax.swing.JPanel implements Observer{
     	clientManager.addObserver(this);
     	listUserFriendModel = (DefaultListModel<User>) list.getModel();
     	clientManager.GetListFriend(clientManager.mNickname);
-
     }
     
     public void addThread(String id, ThreadNewFriend thread) {
@@ -82,6 +81,7 @@ public class FriendListForm extends javax.swing.JPanel implements Observer{
     	
     }
     public void setListModel(User u) {
+    	//System.out.println(u.toString());
     	listUserFriendModel.addElement(u);
     }
     public void initList(Result result) {
@@ -89,8 +89,6 @@ public class FriendListForm extends javax.swing.JPanel implements Observer{
  	   
         if(result.mContent.length()>0)
         {
-            //ds ban có dạng firstname<col>midname<col>lastname<col>birthday<col>age<col>gender<col><row>
-            //                firstname<col>midname<col>lastname<col>birthday<col>age<col>gender<col><row>
         	for(int i=0;i<listUserFriendModel.getSize();i++) {
         		listUserFriendModel.remove(i);
 	        }
@@ -98,8 +96,6 @@ public class FriendListForm extends javax.swing.JPanel implements Observer{
             for (int i = 0; i < rows.length; i++) //hàng đầu là trống
             {
                 String[] cols = rows[i].split("<col>");
-               // listUserFriendModel.addElement(new Room(cols[0],cols[1],Integer.parseInt(cols[2])));
-                System.out.println(cols[8]);
                 listUserFriendModel.addElement(new User(Integer.parseInt(cols[7]),cols[0],cols[1],cols[2],cols[3],Integer.parseInt(cols[4]),cols[5],Boolean.parseBoolean(cols[6]),cols[8],cols[9]));
             }
         }
@@ -139,8 +135,9 @@ public class FriendListForm extends javax.swing.JPanel implements Observer{
     		public void mouseClicked(MouseEvent e) {
     			int s = list.getSelectedIndex();
 				User user = listUserFriendModel.elementAt(s);
-				//System.out.println(user);
+				System.out.println(user.getUsername());
                 if(listThread.containsKey(user.getUsername())) {
+                	listThread.get(user.getUsername()).run();
                 	return;
                 }
                 else {
@@ -184,25 +181,7 @@ public class FriendListForm extends javax.swing.JPanel implements Observer{
         		initList(result);
         		break;
         	}
-        	case ActionType.SEND_MESSAGE:
-            {
-                String[] lines = result.mContent.split(";", -1);
-                String sender = lines[1];
-                String messContent = lines[2];
-                for(int i=0;i<listUserFriendModel.size();i++){
-//                	if(listUserFriendModel.elementAt(i).getUsername().equals(lines[0])) 
-//                	{
-//                		User u = listUserFriendModel.elementAt(i);
-//                		//u.setLastMess(sender +": "+ messContent);
-//                		//System.out.println(r.toString());
-//                		listUserFriendModel.remove(i);
-//                		listUserFriendModel.addElement(u);
-//                		
-//                		return;
-//                	}
-                }
-                break;
-            }
+        	
         	case ActionType.Close_WINDOW_CHAT:
             {
             	if (listThread.containsKey(result.mContent)) listThread.remove(result.mContent);

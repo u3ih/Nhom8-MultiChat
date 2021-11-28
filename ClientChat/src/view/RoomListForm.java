@@ -120,24 +120,20 @@ public class RoomListForm extends javax.swing.JPanel implements Observer {
     		
     		@Override
     		public void mouseClicked(MouseEvent e) {
-    			
-    			
-    			
-    				int s = list.getSelectedIndex();
-    				Room room = listRoomModel.elementAt(s);
-    				
-    				//System.out.println(room.getIdRoom() + " id room");
-    				if(listThread.containsKey(room.getIdRoom())) {
-    					return;
-    				}
-    				else {
-    					ThreadNewRoom newThreadRoom = new ThreadNewRoom(new ChatGroupForm(clientManager,room.getIdRoom(),room.getNameRoom(),room.getCountPeople()));
-    					newThreadRoom.run();				
-    					listThread.put(room.getIdRoom(), newThreadRoom);                  
-    				} 
-    				list.setSelectedIndex(0);
-    			
-    			
+
+    			int s = list.getSelectedIndex();
+				Room room = listRoomModel.elementAt(s);
+                if(listThread.containsKey(room.getIdRoom())) {
+                	return;
+                }
+                else {
+    				ThreadNewRoom newThreadRoom = new ThreadNewRoom(new ChatGroupForm(clientManager,room.getIdRoom(),room.getNameRoom(),room.getCountPeople()));
+                	newThreadRoom.run();				
+                    listThread.put(room.getIdRoom(), newThreadRoom);
+                }
+                
+                list.setSelectedIndex(0);
+
     		}
     		
     	});
