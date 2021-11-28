@@ -53,23 +53,14 @@ create table userConnection(
 
 create table messageBox(
 	id int(5) not null auto_increment,
-    userID1 int(5) not null,
-    userID2 int(5) not null,
-    primary key (id),
-    foreign key (userID1) references user(id),
-    foreign key (userID2) references user(id)
+    username1 varchar(255) not null,
+    username2 varchar(255) not null,
+    content text not null,
+    primary key (id)
 );
 
-create table message(
-	id int not null auto_increment,
-    messBoxID int(5) not null,
-    userID int(4) not null,
-    content text not null,
-    sendDate timestamp not null,
-    primary key (id),
-    foreign key (messBoxID) references messageBox(id),
-    foreign key (userID) references user(id)
-);
 
 INSERT INTO `chat`.`user` (`firstName`, `midName`, `lastName`, `birthDay`, `age`, `gender`, `isOnline`, `username`, `password`, `img`) VALUES ('Tran', 'Trung', 'Hieu', '2000-5-3', '21', 'nam', '0', 'hieutran', 'root', 'oke');
+INSERT INTO `chat`.`user` (`firstName`, `midName`, `lastName`, `birthDay`, `age`, `gender`, `isOnline`, `username`, `password`, `img`) VALUES ('Vu', 'Danh', 'Hung', '2000-5-3', '21', 'nam', '0', 'hungvu', 'root', 'oke');
+INSERT INTO `chat`.`user` (`firstName`, `midName`, `lastName`, `birthDay`, `age`, `gender`, `isOnline`, `username`, `password`, `img`) VALUES ('Tran', 'Hung', 'Minh', '2000-5-3', '21', 'nam', '0', 'minhtran', 'root', 'oke');
 

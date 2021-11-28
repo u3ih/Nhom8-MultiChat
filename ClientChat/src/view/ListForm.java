@@ -245,7 +245,7 @@ public class ListForm extends javax.swing.JFrame implements Observer {
 	}
     protected void btntim(ActionEvent e) {
 		// TODO Auto-generated method stub
-    	friendAddForm faf= new friendAddForm(this, mclientManager,p, listThreadFriend);
+    	friendAddForm faf= new friendAddForm(this, mclientManager,p);
 		faf.setVisible(true);
 	}
 
@@ -350,7 +350,8 @@ public class ListForm extends javax.swing.JFrame implements Observer {
             			u.setId(Integer.parseInt(infos[7]));
             			
             			ThreadNewFriend newThreadFriend = new ThreadNewFriend(new ChatForm(mclientManager, infos[8]));
-            			newThreadFriend.run();
+            			//newThreadFriend.run();
+            			System.out.println(infos[8]);
                         listThreadFriend.put(infos[8], newThreadFriend);
             			p.setListModel(u);
             		}

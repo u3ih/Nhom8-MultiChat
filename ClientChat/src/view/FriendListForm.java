@@ -99,7 +99,7 @@ public class FriendListForm extends javax.swing.JPanel implements Observer{
             {
                 String[] cols = rows[i].split("<col>");
                // listUserFriendModel.addElement(new Room(cols[0],cols[1],Integer.parseInt(cols[2])));
-                System.out.println(cols[8]);
+                //System.out.println(cols[8]);
                 listUserFriendModel.addElement(new User(Integer.parseInt(cols[7]),cols[0],cols[1],cols[2],cols[3],Integer.parseInt(cols[4]),cols[5],Boolean.parseBoolean(cols[6]),cols[8],cols[9]));
             }
         }

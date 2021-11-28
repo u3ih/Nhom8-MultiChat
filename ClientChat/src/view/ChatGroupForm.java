@@ -317,13 +317,14 @@ Result result = (Result)arg;
             	String[] lines = result.mContent.split(";", -1);
             	String sender = lines[0];
                 String username = lines[1];
-                
-                if(username.equals(mClientManager.mNickname))
-                    txtNoiDungChat.append("Me Send file: "+ result.file.getName() +"\n");
-                else
-                    txtNoiDungChat.append(username + " send file " + result.file.getName() + "\n");
-                //System.out.println(result.file.getName());
-                mod.addElement(result.file);
+//                if(lines[0].equals(mMaPhong)) {
+	                if(username.equals(mClientManager.mNickname))
+	                    txtNoiDungChat.append("Me Send file: "+ result.file.getName() +"\n");
+	                else
+	                    txtNoiDungChat.append(username + " send file " + result.file.getName() + "\n");
+	                //System.out.println(result.file.getName());
+	                mod.addElement(result.file);
+//                }
                 break;
             }
             case ActionType.GET_ROOM_MEMBER:

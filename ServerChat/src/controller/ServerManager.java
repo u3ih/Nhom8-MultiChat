@@ -32,12 +32,17 @@ public class ServerManager extends Observable
     ServerSocket mServerSocket;
     Thread mThreadAccept, mThreadProcess;
     //ArrayList<User> mListUser = new ArrayList<>();
-    ArrayList<User> mListFriend = new ArrayList<>();
     ArrayList<User> mListUserOnline = new ArrayList<>();
     ArrayList<Room> mListRoom = new ArrayList<>();
     ArrayList<User> mListUserWaitLogout = new ArrayList<>();
     UserDAO controlUser = new UserDAO();
+<<<<<<< HEAD
     HashMap<String,User> mListUser = controlUser.selectAllUsers();    
+=======
+    ArrayList<User> mListFriend = new ArrayList<>();
+    HashMap<String,User> mListUser = controlUser.selectAllUsers();
+    
+>>>>>>> 737569c (pull)
     DataInputStream mDataInputStream;
     DataOutputStream mDataOutputStream;
     RoomDAO roomDAO = new RoomDAO();
@@ -287,8 +292,8 @@ public class ServerManager extends Observable
     			check = true;
     		}
     	}
-        user.SendFile(ActionType.SEND_FILE, ResultCode.OK, + userFriend.getId() + ";" +user.getUsername() +";", file);
-        if(check) userFriend.SendFile(ActionType.SEND_FILE, ResultCode.OK, userFriend.getId() + ";" +user.getUsername() +";", file);
+        user.SendFile(ActionType.SEND_FILE, ResultCode.OK, user.getUsername()+friendUsername + ";" +user.getUsername() +";", file);
+        if(check) userFriend.SendFile(ActionType.SEND_FILE, ResultCode.OK, user.getUsername()+friendUsername + ";" +user.getUsername() +";", file);
     }
     
     void ProcessRequest(User user, String request)
@@ -355,9 +360,7 @@ public class ServerManager extends Observable
             {
             	
                 List<MessageRoom> list = roomDAO.getMessByRoomID(lines[1]);
-                for(MessageRoom mess:list) {
-                	System.out.println(mess.getSender() + " " + mess.getMess());
-                }
+
                 int size = list.size();
                 if(size>0)
                 {
@@ -365,14 +368,36 @@ public class ServerManager extends Observable
                     String listMess = "";
                     for (int i = 0; i < size; i++) 
                     {
-                        
                             MessageRoom mess = list.get(i);
                             listMess+= mess.getSender() + "<col>" + mess.getMess() + "<col>" + "<row>";
-                        
                         
                     }
                     user.Send(actionType, ResultCode.OK,lines[1] + ";" + listMess);
                     
+                }else
+                {
+                    user.Send(actionType, ResultCode.OK, "");
+                }
+                //notifyObservers(user.getLastName() + " Vừa lấy danh sách tin nhắn ");
+                break;
+            }
+            
+            case ActionType.GET_MESS_BOX:
+            {
+            	
+                List<MessageRoom> list = roomDAO.getMessByRoomBox(lines[1], lines[2]);
+
+                int size = list.size();
+                if(size>0)
+                {
+                    
+                    String listMess = "";
+                    for (int i = 0; i < size; i++) 
+                    {
+                            MessageRoom mess = list.get(i);
+                            listMess+= mess.getSender() + "<col>" + mess.getMess() + "<col>" + "<row>";
+                    }
+                    user.Send(actionType, ResultCode.OK, lines[1]+lines[2]+";" + listMess);
                     
                 }else
                 {
@@ -381,6 +406,7 @@ public class ServerManager extends Observable
                 notifyObservers(user.getLastName() + " Vừa lấy danh sách tin nhắn ");
                 break;
             }
+            
             case ActionType.GET_ROOM_MEMBER:
             {
             	
@@ -484,8 +510,12 @@ public class ServerManager extends Observable
                 String contentMess = "";
                 if(lines.length>=2)
                     contentMess = lines[2];   //query cÃ³ dáº¡ng actionType;contentMess
-                user.Send(ActionType.SEND_MESSAGE, ResultCode.OK, + userFriend.getId() + ";" +user.getUsername() +";"+ contentMess);
-                if(check) userFriend.Send(ActionType.SEND_MESSAGE, ResultCode.OK, userFriend.getId() + ";" +user.getUsername() +";"+  contentMess);
+                
+                user.Send(ActionType.SEND_MESSAGE, ResultCode.OK, user.getUsername()+lines[1] + ";" +user.getUsername() +";"+ contentMess);
+                roomDAO.InsertMessBox(user.getUsername(), lines[1], contentMess);
+                if(check) {
+                	userFriend.Send(ActionType.SEND_MESSAGE, ResultCode.OK, user.getUsername()+lines[1] + ";" +user.getUsername() +";"+  contentMess);
+                }
                 //roomDAO.InsertMess(user.getRoom(lines[1]).getIdRoom(), user.getId(), contentMess);
                 //roomDAO.UpdateLastMess(user.getRoom(lines[1]).getIdRoom(),user.getUsername()+": "+ contentMess);
                 //notifyObservers(user.getUsername() + " vừa gửi tin");
@@ -625,8 +655,8 @@ public class ServerManager extends Observable
             	int id = controlUser.selectIDbyuname(uname);
 //            	//int a= Integer.parseInt(id);
             	//List<User> list = user.getId();//query có dạng actionType;
-            	List<User> list = controlUser.selectFriendbyId(id);
-//               
+            	ArrayList<User> list = controlUser.selectFriendbyId(id);
+                //mListFriend = list;
             	//List<Room> list = roomDAO.getRoomByUserID(user.getId());//query cÃ³ dáº¡ng actionType;
                 int size = list.size();       
                 if(size>0)

@@ -45,7 +45,7 @@ public class ChatForm extends javax.swing.JFrame implements Observer{
         this.mClientManager = clientManager;
         this.mUserFriend = mUserFriend;
         mClientManager.addObserver(this);
-        //mClientManager.getMess(mMaPhong);
+        mClientManager.getMessBox(mClientManager.mNickname,mUserFriend);
     }
 
    
@@ -247,7 +247,7 @@ Result result = (Result)arg;
         
         if(result.mResultCode.equals(ResultCode.ERROR))
         {
-            JOptionPane.showMessageDialog(null, result.mContent, "ThÃ¡ÂºÂ¥t bÃ¡ÂºÂ¡i", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, result.mContent, "Thất bại", JOptionPane.ERROR_MESSAGE);
             return;
         }
         switch (result.mActionType)
@@ -255,8 +255,10 @@ Result result = (Result)arg;
         case ActionType.SEND_MESSAGE:
         {
             String[] lines = result.mContent.split(";", -1);
-            //if(lines[0].equals(mMaFriend)) {
-            	String sender = lines[1];
+            String sender = lines[1];
+            //System.out.println("line[0]: "+lines[0]+" sender: "+sender+" ufriend: "+mUserFriend);
+            
+            if(lines[0].equals(sender+mUserFriend) || lines[0].equals(sender+mClientManager.mNickname)) {
                 String messContent = lines[2];
                 //System.out.println(sender +" " + messContent +"\n");
                 messContent = messContent.replaceAll("<br>", "\n");  //khi tin nhÃ¡ÂºÂ¯n gÃ¡Â»Â­i Ã„â€˜i Ã„â€˜Ä‚Â£ thay kÄ‚Â½ tÃ¡Â»Â± xuÃ¡Â»â€˜ng dÄ‚Â²ng bÃ¡ÂºÂ±ng <br> nÄ‚Âªn khi nhÃ¡ÂºÂ­n vÃ¡Â»ï¿½ thÄ‚Â¬ thay ngÃ†Â°Ã¡Â»Â£c lÃ¡ÂºÂ¡i
@@ -264,71 +266,50 @@ Result result = (Result)arg;
                 	txtNoiDungChat.append("Me: " + messContent + "\n");
                 else
                 	txtNoiDungChat.append(sender + ": " + messContent + "\n");
-            //}
+            }
             break;
         }
-//        case ActionType.GET_MESS:
-//    	{
-//    		if(result.mContent.length()>0)
-//    	    {
-//    	        String[] lines = result.mContent.split(";",-1);
-//    	        if(lines[0].equals(mMaPhong)) {
-//    	        	String[] rows = lines[1].split("<row>");
-//    	        		for (int i = 0; i < rows.length; i++) //hÄ‚Â ng Ã„â€˜Ã¡ÂºÂ§u lÄ‚Â  trÃ¡Â»â€˜ng
-//    	        		{
-//    	        			String[] cols = rows[i].split("<col>");
-//    	            
-//    	        			String sender = cols[0];
-//    	        			String messContent = cols[1];
-//    	        			if(sender.equals(mClientManager.mNickname))
-//    	        				txtNoiDungChat.append("Me: " + messContent + "\n");    
-//    	        			else
-//    	        				txtNoiDungChat.append(sender + ": " + messContent + "\n");
-//    	            
-//    	        }}
-//    	    }
-//    		break;
-//    	}
+        case ActionType.GET_MESS_BOX:
+    	{
+    		if(result.mContent.length()>0)
+    	    {
+    	        String[] lines = result.mContent.split(";",-1);
+    	        if(lines[0] != null) {
+    	        	String[] rows = lines[1].split("<row>");
+    	        		for (int i = 0; i < rows.length; i++) //hÄ‚Â ng Ã„â€˜Ã¡ÂºÂ§u lÄ‚Â  trÃ¡Â»â€˜ng
+    	        		{
+    	        			String[] cols = rows[i].split("<col>");
+    	            
+    	        			String sender = cols[0];
+    	        			String messContent = cols[1];
+    	        			System.out.println(sender + ": "+ messContent);
+    	        			System.out.println(lines[0]+ " name room" + " /"+sender+mUserFriend + "/ " +sender+mClientManager.mNickname+ " /"+mUserFriend+sender);
+    	        			if(lines[0].equals(sender+mUserFriend) || lines[0].equals(mClientManager.mNickname+mUserFriend)) {
+	    	        			if(sender.equals(mClientManager.mNickname))
+	    	        				txtNoiDungChat.append("Me: " + messContent + "\n");
+	    	        			else
+	    	        				txtNoiDungChat.append(sender + ": " + messContent + "\n");
+    	        			}
+    	        		}
+    	        }
+    	    }
+    		break;
+    	}
             case ActionType.SEND_FILE:
             {
             	String[] lines = result.mContent.split(";", -1);
             	String sender = lines[0];
                 String username = lines[1];
-                
-                if(username.equals(mClientManager.mNickname))
-                    txtNoiDungChat.append("Me Send file: "+ result.file.getName() +"\n");
-                else
-                    txtNoiDungChat.append(username + " send file " + result.file.getName() + "\n");
-                //System.out.println(result.file.getName());
-                mod.addElement(result.file);
+//                if(lines[0].equals(sender+mUserFriend) || lines[0].equals(sender+mClientManager.mNickname)) {
+	                if(username.equals(mClientManager.mNickname))
+	                    txtNoiDungChat.append("Me Send file: "+ result.file.getName() +"\n");
+	                else
+	                    txtNoiDungChat.append(username + " send file " + result.file.getName() + "\n");
+	                //System.out.println(result.file.getName());
+	                mod.addElement(result.file);
+//                }
                 break;
             }
-//            case ActionType.GET_ROOM_MEMBER:
-//        	{
-//        		System.out.println(result.mContent + "\n");
-//        		if(result.mContent.length()>0)
-//        	    {
-//        			String[] lines = result.mContent.split(";",-1);
-//        			System.out.println(lines[0]+" ");
-//        			if(lines[0].equals(mMaPhong)) {
-//        				jTextArea2.setText("");
-//        	        for (int i = 1; i < lines.length; i++)
-//        	        {
-//        	        	System.out.println(lines[i]+" ");
-//        	            jTextArea2.append(lines[i] + "\n");
-//        	            
-//        	        }
-//        			}
-//        	    }
-//        		break;
-//        	}
-//            case ActionType.UPDATE_NUMBER_USER:
-//            {
-//                String soNguoi = result.mContent;
-//                mSoNguoi = Integer.parseInt(soNguoi);
-//                setTitle("ID: " + mMaPhong + " Name: " + mTenPhong + " So nguoi trong phong: " + mSoNguoi);
-//                break;
-//            }
            case ActionType.NOTIFY_JUST_JOIN_ROOM:
             {
             	String[] lines = result.mContent.split(";", -1);

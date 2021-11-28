@@ -222,7 +222,7 @@ public class UserDAO {
                 = connection.prepareStatement(SELECT_FRIENDUSER_BY_ID);) {       	
         		//userID2 = selectIdFriend()
     		preparedStatement.setInt(1, userID);
-            System.out.println(preparedStatement);
+            //System.out.println(preparedStatement);
             // Step 3: Execute the query or update query
             ResultSet rs = preparedStatement.executeQuery();
             while (rs.next()) {
