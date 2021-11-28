@@ -89,9 +89,9 @@ public class FriendListForm extends javax.swing.JPanel implements Observer{
  	   
         if(result.mContent.length()>0)
         {
-        	for(int i=0;i<listUserFriendModel.getSize();i++) {
-        		listUserFriendModel.remove(i);
-	        }
+//        	for(int i=0;i<listUserFriendModel.getSize();i++) {
+//        		listUserFriendModel.remove(i);
+//	        }
             String[] rows = result.mContent.split("<row>");
             for (int i = 0; i < rows.length; i++) //hàng đầu là trống
             {
