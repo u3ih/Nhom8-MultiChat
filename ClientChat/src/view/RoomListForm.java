@@ -53,7 +53,6 @@ public class RoomListForm extends javax.swing.JPanel implements Observer {
     	listRoomModel = (DefaultListModel<Room>) list.getModel();
     	clientManager.GetListRoom();
 
-        
     }
     
     public void addThread(String id, ThreadNewRoom thread) {
@@ -67,20 +66,20 @@ public class RoomListForm extends javax.swing.JPanel implements Observer {
 	public void initList(Result result) {
         
 	   System.out.println(result.mContent.length());
-    if(result.mContent.length()>0 || result.mContent != "")
-    {
-        for(int i=0;i<listRoomModel.getSize();i++) {
-        	listRoomModel.remove(i);
-        }
-        String[] rows = result.mContent.split("<row>");
-        for (int i = 0; i < rows.length; i++) //hàng đầu là trống
-        {
-            String[] cols = rows[i].split("<col>");
-            listRoomModel.addElement(new Room(cols[0],cols[1],Integer.parseInt(cols[2]),cols[3]));
-            
-        }
-        
-    }
+	    if(result.mContent.length()>0 || result.mContent != "")
+	    {
+	        for(int i=0;i<listRoomModel.getSize();i++) {
+	        	listRoomModel.remove(i);
+	        }
+	        String[] rows = result.mContent.split("<row>");
+	        for (int i = 0; i < rows.length; i++) //hàng đầu là trống
+	        {
+	            String[] cols = rows[i].split("<col>");
+	            listRoomModel.addElement(new Room(cols[0],cols[1],Integer.parseInt(cols[2]),cols[3]));
+	            
+	        }
+	        
+	    }
 	
     }
 
@@ -112,6 +111,7 @@ public class RoomListForm extends javax.swing.JPanel implements Observer {
     		public void mouseClicked(MouseEvent e) {
     			int s = list.getSelectedIndex();
 				Room room = listRoomModel.elementAt(s);
+				//System.out.println(room.getIdRoom() + " id room");
                 if(listThread.containsKey(room.getIdRoom())) {
                 	return;
                 }

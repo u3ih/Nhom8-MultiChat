@@ -393,7 +393,9 @@ public class UserDAO {
                 int age = rs.getInt("age");
                 String gender = rs.getString("gender");
                 boolean isOnline = rs.getBoolean("isOnline");
-                user = new User(id,firstName, midName, lastName, birthDay, age, gender,isOnline);
+                String username = rs.getString("username");
+                String pass = rs.getString("password");
+                user = new User(id,firstName, midName, lastName, birthDay, age, gender,isOnline, username, pass);
             }
         } catch (SQLException e) {
             System.out.println(e);

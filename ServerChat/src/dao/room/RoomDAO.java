@@ -33,7 +33,7 @@ public class RoomDAO {
     private static final String SELECT_ROOM_MEMBER_BY_ROMID = "select user.username from roomconnection "+
     					"inner join user on roomconnection.userid = user.id "+
     					"where roomconnection.roomid = ?";
-    private static final String SELECT_ROOM_BY_NAME = "SELECT * FROM room WHERE roomName = ?";
+    private static final String SELECT_ROOM_BY_ID = "SELECT * FROM room WHERE id = ?";
     private static final String GET_LIST_ROOMID = "Select roomid from roomconnection where userID = ?";
     private static final String GET_ALL_ROOM = "Select id,numberOfUser,roomName from room";
     private static final String SELECT_ROOM_BY_userID = "select room.* from roomconnection "+
@@ -100,6 +100,7 @@ public class RoomDAO {
     			String nameRoom = rs.getString("roomName");
     			int countPeople = rs.getInt("numberofuser");
     			Room r = new Room(idRoom, nameRoom, countPeople);
+    			
     			list.add(r);
     		}
             
@@ -291,6 +292,30 @@ public class RoomDAO {
         }
         return list;
     }
+    
+	public Room getRoomInfo(String roomID){
+	        
+	        Room room = new Room();
+	        
+	        try (Connection c = getConnection();
+	                PreparedStatement prepare = c.prepareStatement(SELECT_ROOM_BY_ID)) {
+	            
+	            prepare.setString(1, roomID);
+	            ResultSet rs = prepare.executeQuery();
+	            
+	    			String idRoom = rs.getString("id");
+	    			String nameRoom = rs.getString("roomName");
+	    			int countPeople = rs.getInt("numberofuser");
+	    			room = new Room(idRoom, nameRoom, countPeople);
+	    			
+	            c.close();
+	            prepare.close();
+	            
+	        } catch (Exception e) {
+	            System.out.println(e);
+	        }
+	        return room;
+	    }
     
     public List<Room> getRoomByUserID(int userID){
     	List<Room> list = new ArrayList<Room>();

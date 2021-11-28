@@ -8,6 +8,7 @@ import javax.swing.JPanel;
 import javax.swing.GroupLayout.Alignment;
 
 import java.awt.event.WindowEvent;
+import java.util.HashMap;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -21,6 +22,9 @@ import controller.ClientManager;
 import model.ActionType;
 import model.Result;
 import model.ResultCode;
+import model.Room;
+import model.ThreadNewFriend;
+import model.ThreadNewRoom;
 import model.User;
 
 import javax.swing.LayoutStyle.ComponentPlacement;
@@ -43,12 +47,14 @@ public class friendAddForm extends javax.swing.JFrame implements Observer{
 	ClientManager mCLientManager;
 	ListForm mlistForm;
 	FriendListForm p;
-    public friendAddForm(ListForm listform, ClientManager clientmanager,FriendListForm p) {
+	private HashMap<String,ThreadNewFriend> listThread = new HashMap<String,ThreadNewFriend>();
+    public friendAddForm(ListForm listform, ClientManager clientmanager,FriendListForm p, HashMap<String,ThreadNewFriend> listThread) {
     	initComponents();
     	mlistForm = listform;
     	mCLientManager= clientmanager;
         mCLientManager.addObserver(this);
         this.p=p;
+        this.listThread = listThread;
         dtm = (DefaultTableModel)table.getModel();
     }
 
@@ -194,34 +200,6 @@ public class friendAddForm extends javax.swing.JFrame implements Observer{
             break;
     		}
     		
-    	case ActionType.Ket_Ban:
-        {
-        	if(result.mResultCode.equals(ResultCode.OK)) {
-        		if(result.mContent.equals("error")) {
-        			JOptionPane.showMessageDialog(null, "Đã kết bạn với người dùng này", "Thất bại", JOptionPane.ERROR_MESSAGE);
-        		}
-        		else {
-        			JOptionPane.showMessageDialog(null, "Kết bạn thành công", "ThÃ nh cÃ´ng", JOptionPane.INFORMATION_MESSAGE);
-        			String[] infos=result.mContent.split(";");
-        			User u = new User();
-        			u.setFirstName(infos[0]);
-        			u.setMidName(infos[1]);
-        			u.setLastName(infos[2]);
-        			u.setBirthDay(infos[3]);
-        			u.setAge(Integer.parseInt(infos[4]));
-        			u.setGender(infos[5]);
-        			u.setOnline(Boolean.parseBoolean(infos[6]));
-        			u.setId(Integer.parseInt(infos[7]));
-        			p.setListModel(u);;
-        		}
-    			
-    		}
-    		else
-    		{
-    			JOptionPane.showMessageDialog(null, result.mContent, "Tháº¥t báº¡i", JOptionPane.ERROR_MESSAGE);
-    		}
-        	break;
-        }
     }
         
 	}
