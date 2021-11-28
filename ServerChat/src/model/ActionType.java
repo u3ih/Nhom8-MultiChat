@@ -30,4 +30,6 @@ public class ActionType {
     public static final String GET_ROOM_BY_ID = "get_room_by_id";
     public static final String GET_MESS_BOX = "get_mess_box";
     public static final String 	CALL_DISPLAY_FRIEND = "callDisplayFriend";
+    public static final String Xoa_Ban = "delete_Friend";
+    public static final String 	CALL_UNDISPLAY_FRIEND = "callUndisplayFriend";
 }

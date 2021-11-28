@@ -33,6 +33,7 @@ public class UserDAO {
     private static final String SELECT_ID_BY_UNAME = "select id from user where username =  ?";
     private static final String SELECT_USER_BY_NAME = "select id,firstName,midName,lastName,birthDay,age,gender from user where lastName=? and username not like ?";
     private static final String INSERT_USERCONNECTION_SQL = "INSERT INTO userconnection" + " (userID1,userID2) VALUES " +" (?, ?);";
+    private static final String DELETE_USERCONNECTION_SQL="DELETE FROM chat.userconnection WHERE userID1=? AND userID2=?;";
     private static final String SELECT_ID_FRIEND =" select userID2 from userconnection where userID1 =?";
     private static final String UPDATE_USER_ONLINE = "update user set isOnline = ? where username = ?";
     private static final String SELECT_isOnline_BY_UNAME = "select isOnline from user where username =  ?";
@@ -336,7 +337,26 @@ public class UserDAO {
       }
      return rowUpdated;  
     }
-
+    public boolean deleteUserconnection(int userID1,String uname) throws SQLException {
+    	boolean rowUpdated=false;
+        try (Connection connection = getConnection(); 
+                PreparedStatement statement
+                = connection.prepareStatement(DELETE_USERCONNECTION_SQL);
+                PreparedStatement statement1
+                = connection.prepareStatement(DELETE_USERCONNECTION_SQL)) {
+            int userID2= selectIDbyuname(uname);
+            statement.setInt(1, userID2);
+            statement.setInt(2, userID1);
+            
+           rowUpdated = statement.executeUpdate() > 0;
+           statement1.setInt(1, userID1);
+           statement1.setInt(2, userID2);
+           statement1.executeUpdate();
+        } catch (Exception e){
+         System.out.println(e);
+      }
+     return rowUpdated;  
+    }
     public boolean deleteUser(int id) throws SQLException {
         boolean rowDeleted;
         try (Connection connection = getConnection(); PreparedStatement statement

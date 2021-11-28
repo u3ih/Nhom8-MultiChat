@@ -444,6 +444,17 @@ public class ClientManager extends Observable{
 			notifyObservers(result);
 		}
     }
+    public void xoaban(int userID, String uname) {
+    	String line = ActionType.Xoa_Ban + ";"+ userID+";"+uname;
+    	try {
+			mBufferWriter.write(line+"\n");
+			mBufferWriter.flush();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			Result result = new Result("", ResultCode.ERROR, "Kết nối tới server có lỗi");
+			notifyObservers(result);
+		}
+    }
     public void callOnline(String uname) {
     	String line = ActionType.CALL_ONLINE+";"+uname;
     	try {
@@ -468,6 +479,17 @@ public class ClientManager extends Observable{
     }
     public void callDisplayFriend(int userID, String uname) {
     	String line = ActionType.CALL_DISPLAY_FRIEND + ";"+ userID+";"+uname;
+    	try {
+			mBufferWriter.write(line+"\n");
+			mBufferWriter.flush();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			Result result = new Result("", ResultCode.ERROR, "Kết nối tới server có lỗi");
+			notifyObservers(result);
+		}
+    }
+    public void callUndisplayFriend(int userID, String uname) {
+    	String line = ActionType.CALL_UNDISPLAY_FRIEND + ";"+ userID+";"+uname;
     	try {
 			mBufferWriter.write(line+"\n");
 			mBufferWriter.flush();

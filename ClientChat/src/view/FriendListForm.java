@@ -1,16 +1,21 @@
 
 package view;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.HashMap;
 import java.util.Observable;
 import java.util.Observer;
 
+import javax.swing.Action;
 import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JList;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 
@@ -38,7 +43,8 @@ public class FriendListForm extends javax.swing.JPanel implements Observer{
 	private JScrollPane scrollPane;
 	private GroupLayout groupLayout;
 	private HashMap<String,ThreadNewFriend> listThread = new HashMap<String,ThreadNewFriend>();
-	
+	private int time = 0;
+    TimerThread thread;
     public FriendListForm(ClientManager clientManager, HashMap<String,ThreadNewFriend> listThread) {
         initComponents();
         this.clientManager = clientManager;
@@ -51,7 +57,18 @@ public class FriendListForm extends javax.swing.JPanel implements Observer{
     public void addThread(String id, ThreadNewFriend thread) {
     	listThread.put(id, thread);
     }
-    
+    public void deleteFriend(User user) {
+    	int tmp=-1;
+    	for(int i=0;i<listUserFriendModel.size();i++) {
+    		if(listUserFriendModel.get(i).getId() == user.getId()) {
+    			tmp=i;
+    		}
+    	}
+    	if(tmp != -1) {
+    		listUserFriendModel.remove(tmp);
+    	}
+    	
+    }
     public void checkFriend(User user) {
     	int tmp=-1;
     	for(int i=0;i<listUserFriendModel.size();i++) {
@@ -92,7 +109,7 @@ public class FriendListForm extends javax.swing.JPanel implements Observer{
 //        		listUserFriendModel.remove(i);
 //	        }
             String[] rows = result.mContent.split("<row>");
-            for (int i = 0; i < rows.length; i++) //hàng đầu là trống
+            for (int i = 0; i < rows.length; i++) //hÃ ng Ä‘áº§u lÃ  trá»‘ng
             {
                 String[] cols = rows[i].split("<col>");
                 listUserFriendModel.addElement(new User(Integer.parseInt(cols[7]),cols[0],cols[1],cols[2],cols[3],Integer.parseInt(cols[4]),cols[5],Boolean.parseBoolean(cols[6]),cols[8],cols[9]));
@@ -130,22 +147,48 @@ public class FriendListForm extends javax.swing.JPanel implements Observer{
     	list.setDragEnabled(true);
     	list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     	list.addMouseListener(new MouseAdapter() {
+//    		@Override
+//    		public void mouseClicked(MouseEvent e) {
+//    			int s = list.getSelectedIndex();
+//				User user = listUserFriendModel.elementAt(s);
+//				System.out.println(user.getUsername());
+//                if(listThread.containsKey(user.getUsername())) {
+//                	listThread.get(user.getUsername()).run();
+//                	return;
+//                }
+//                else {
+//    				ThreadNewFriend newThreadFriend = new ThreadNewFriend(new ChatForm(clientManager, user.getUsername()));
+//    				newThreadFriend.run();
+//                    listThread.put(user.getUsername(), newThreadFriend);
+//                }
+//                
+//                list.setSelectedIndex(0);
+//    		}
     		@Override
-    		public void mouseClicked(MouseEvent e) {
-    			int s = list.getSelectedIndex();
-				User user = listUserFriendModel.elementAt(s);
-				System.out.println(user.getUsername());
-                if(listThread.containsKey(user.getUsername())) {
-                	listThread.get(user.getUsername()).run();
-                	return;
-                }
-                else {
-    				ThreadNewFriend newThreadFriend = new ThreadNewFriend(new ChatForm(clientManager, user.getUsername()));
-    				newThreadFriend.run();
-                    listThread.put(user.getUsername(), newThreadFriend);
-                }
-                
-                list.setSelectedIndex(0);
+    		public void mousePressed(MouseEvent e) {
+    			time = 0;
+    			thread = new TimerThread(e,list);
+    	        thread.start();
+    		}
+    		@Override
+    		public void mouseReleased(MouseEvent e) {
+    			thread.stop();
+    	        if(time <2){
+    	        	int s = list.getSelectedIndex();
+    				User user = listUserFriendModel.elementAt(s);
+    				System.out.println(user.getUsername());
+                    if(listThread.containsKey(user.getUsername())) {
+                    	listThread.get(user.getUsername()).run();
+                    	return;
+                    }
+                    else {
+        				ThreadNewFriend newThreadFriend = new ThreadNewFriend(new ChatForm(clientManager, user.getUsername()));
+        				newThreadFriend.run();
+                        listThread.put(user.getUsername(), newThreadFriend);
+                    }
+                    
+                    list.setSelectedIndex(0);
+    	        }
     		}
     	});
     	
@@ -170,7 +213,7 @@ public class FriendListForm extends javax.swing.JPanel implements Observer{
 		Result result = (Result)arg;
         if(result.mResultCode.equals(ResultCode.ERROR))
         {
-            JOptionPane.showMessageDialog(null, result.mContent, "Thất bại", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, result.mContent, "Tháº¥t báº¡i", JOptionPane.ERROR_MESSAGE);
             return;
         }
         switch (result.mActionType)
@@ -180,11 +223,92 @@ public class FriendListForm extends javax.swing.JPanel implements Observer{
         		initList(result);
         		break;
         	}
-        	
+        	case ActionType.Xoa_Ban:
+        	{
+        		if(result.mResultCode.equals(ResultCode.OK)) {
+            			JOptionPane.showMessageDialog(null, "Xóa bạn thành công", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+            			String[] infos=result.mContent.split(";");
+            			User u = new User();
+            			u.setFirstName(infos[0]);
+            			u.setMidName(infos[1]);
+            			u.setLastName(infos[2]);
+            			u.setBirthDay(infos[3]);
+            			u.setAge(Integer.parseInt(infos[4]));
+            			u.setGender(infos[5]);
+            			u.setOnline(Boolean.parseBoolean(infos[6]));
+            			u.setId(Integer.parseInt(infos[7]));
+            			u.setUsername(infos[8]);
+            			deleteFriend(u);
+            		}
+        			
+        		else
+        		{
+        			JOptionPane.showMessageDialog(null, result.mContent, "Thất bại", JOptionPane.ERROR_MESSAGE);
+        		}
+            	break;
+        	}
+        	case ActionType.CALL_UNDISPLAY_FRIEND:
+        	{
+        		String[] lines = result.mContent.split(";");
+            	User u= new User();
+            	u.setFirstName(lines[0]);
+            	u.setMidName(lines[1]);
+            	u.setLastName(lines[2]);
+            	u.setBirthDay(lines[3]);
+            	u.setAge(Integer.parseInt(lines[4]));
+            	u.setGender(lines[5]);
+            	u.setOnline(Boolean.parseBoolean(lines[6]));
+            	u.setId(Integer.parseInt(lines[7]));
+            	u.setUsername(lines[8]);
+            	deleteFriend(u);
+            	break;
+        	}
         	case ActionType.Close_WINDOW_CHAT:
             {
             	if (listThread.containsKey(result.mContent)) listThread.remove(result.mContent);
+            	break;
             }
         }
-	}		
+	}
+	                                                                            
+class TimerThread extends Thread{
+        
+        private java.awt.event.MouseEvent evt;
+        private JList list;
+        
+        @Override
+        public void run() {
+            while(true){
+                try {
+                    if(time == 2){
+                        JPopupMenu menu = new JPopupMenu();
+                        JMenuItem a= new JMenuItem("delete");
+						a.addActionListener(new ActionListener() {
+				        	public void actionPerformed(ActionEvent e) {
+				        		int s = list.getSelectedIndex();
+			    				User user = listUserFriendModel.elementAt(s);
+			    				clientManager.callUndisplayFriend(user.getId(), clientManager.mNickname);
+			    				clientManager.xoaban(user.getId(), clientManager.mNickname);
+				        	}
+				        });
+                        menu.add(a);
+                        menu.show(list, evt.getX(), evt.getY());
+                        
+                        break;
+                    }
+                    time++;
+                    Thread.sleep(500);
+                    System.out.println(time);
+                    
+                } catch (Exception e) {
+                }
+            }
+        }
+        
+        public TimerThread(java.awt.event.MouseEvent evt,JList list){
+            this.evt = evt;
+            this.list = list;
+        }
+
+    }
 }
