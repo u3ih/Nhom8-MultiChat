@@ -581,7 +581,11 @@ public class ServerManager extends Observable
             }
             case ActionType.LOGOUT:    //query có dạng actionType;
             {
-                
+                for(Room room : user.getListRoom()) {
+                	if(listRoom.containsKey(room.getIdRoom())) {
+                		listRoom.get(room.getIdRoom()).RemoveUser(user);
+                	}
+                }
                 user.setOnline(false);
                 try {
                 	controlUser.updateOnline(user);
@@ -589,8 +593,6 @@ public class ServerManager extends Observable
 					// TODO: handle exception
 				}
                 
-                //vì mListUser luôn được sử dụng bởi thread đợi kết quả, nên can thiệp vào giữa chừng rất dễ gây lỗi
-                //Nên ta sử dụng một list hàng đợi, thread đợi kết quả sẽ xóa các user này khi duyệt đợi kết quả xong
                 mListUserWaitLogout.add(user); 
                 notifyObservers(user.getUsername() + " vừa đăng xuất");
                 break;
