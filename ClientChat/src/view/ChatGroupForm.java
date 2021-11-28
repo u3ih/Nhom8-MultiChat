@@ -27,6 +27,7 @@ import model.ActionType;
 import model.DataFile;
 import model.Result;
 import model.ResultCode;
+import javax.swing.ImageIcon;
 
 /**
  *
@@ -106,7 +107,7 @@ public class ChatGroupForm extends javax.swing.JFrame implements Observer{
             }
         });
 
-        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Image/icons8-phone-24.png"))); // NOI18N
+        jButton1.setIcon(new ImageIcon(ChatGroupForm.class.getResource("/Image/logout-icon-16.png"))); // NOI18N
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
@@ -160,19 +161,20 @@ public class ChatGroupForm extends javax.swing.JFrame implements Observer{
         			.addGap(18)
         			.addGroup(layout.createParallelGroup(Alignment.LEADING)
         				.addComponent(jLabel1)
-        				.addGroup(layout.createParallelGroup(Alignment.LEADING, false)
-        					.addGroup(layout.createSequentialGroup()
-        						.addComponent(btnSendGroup, GroupLayout.PREFERRED_SIZE, 81, GroupLayout.PREFERRED_SIZE)
-        						.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        						.addComponent(jButton1, GroupLayout.PREFERRED_SIZE, 65, GroupLayout.PREFERRED_SIZE))
+        				.addGroup(layout.createParallelGroup(Alignment.LEADING)
+        					.addComponent(btnSendGroup, GroupLayout.PREFERRED_SIZE, 81, GroupLayout.PREFERRED_SIZE)
         					.addGroup(layout.createSequentialGroup()
         						.addGroup(layout.createParallelGroup(Alignment.LEADING)
         							.addComponent(jTextArea2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
         							.addComponent(lblNewLabel, GroupLayout.PREFERRED_SIZE, 70, GroupLayout.PREFERRED_SIZE))
         						.addPreferredGap(ComponentPlacement.RELATED)
-        						.addComponent(jScrollPane3, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
-        				.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 168, GroupLayout.PREFERRED_SIZE))
+        						.addComponent(jScrollPane3, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+        					.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 168, GroupLayout.PREFERRED_SIZE)))
         			.addContainerGap(17, Short.MAX_VALUE))
+        		.addGroup(Alignment.TRAILING, layout.createSequentialGroup()
+        			.addContainerGap(529, Short.MAX_VALUE)
+        			.addComponent(jButton1)
+        			.addContainerGap())
         );
         layout.setVerticalGroup(
         	layout.createParallelGroup(Alignment.LEADING)
@@ -196,13 +198,16 @@ public class ChatGroupForm extends javax.swing.JFrame implements Observer{
         							.addComponent(lblNewLabel)))
         					.addGap(18)
         					.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 149, GroupLayout.PREFERRED_SIZE)))
-        			.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         			.addGroup(layout.createParallelGroup(Alignment.LEADING)
-        				.addGroup(layout.createParallelGroup(Alignment.BASELINE)
-        					.addComponent(jTextField2, GroupLayout.PREFERRED_SIZE, 54, GroupLayout.PREFERRED_SIZE)
-        					.addComponent(btnSendGroup, GroupLayout.PREFERRED_SIZE, 33, GroupLayout.PREFERRED_SIZE))
-        				.addComponent(jButton1, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE))
-        			.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        				.addGroup(layout.createSequentialGroup()
+        					.addPreferredGap(ComponentPlacement.UNRELATED)
+        					.addGroup(layout.createParallelGroup(Alignment.BASELINE)
+        						.addComponent(jTextField2, GroupLayout.PREFERRED_SIZE, 54, GroupLayout.PREFERRED_SIZE)
+        						.addComponent(btnSendGroup, GroupLayout.PREFERRED_SIZE, 33, GroupLayout.PREFERRED_SIZE)))
+        				.addGroup(layout.createSequentialGroup()
+        					.addGap(28)
+        					.addComponent(jButton1)))
+        			.addContainerGap(20, Short.MAX_VALUE))
         );
         
         list = new javax.swing.JList<>();
@@ -229,6 +234,10 @@ public class ChatGroupForm extends javax.swing.JFrame implements Observer{
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
+    	this.dispose();
+    	closeWindow();
+    	mClientManager.LeaveRoom(mMaPhong);
+    	
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jTextField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField2ActionPerformed
@@ -346,13 +355,19 @@ Result result = (Result)arg;
         	    }
         		break;
         	}
-//            case ActionType.UPDATE_NUMBER_USER:
-//            {
-//                String soNguoi = result.mContent;
-//                mSoNguoi = Integer.parseInt(soNguoi);
-//                setTitle("ID: " + mMaPhong + " Name: " + mTenPhong + " So nguoi trong phong: " + mSoNguoi);
-//                break;
-//            }
+            case ActionType.NOTIFY_JUST_LEAVE_ROOM:
+            {
+            	String[] lines = result.mContent.split(";", -1);
+            	if(lines[0].equals(mMaPhong)) {
+            		String userLeave = lines[1];
+            		txtNoiDungChat.append("<" + userLeave + "> vừa rời phòng\n" );
+            		mSoNguoi --;
+            		setTitle("ID: " + mMaPhong + " Name: " + mTenPhong + " So nguoi trong phong: " + mSoNguoi);
+            		mClientManager.GetRoomMember(mMaPhong);
+            	}
+//                jTextArea2.append(userJoin + "\n");
+                break;
+            }
            case ActionType.NOTIFY_JUST_JOIN_ROOM:
             {
             	String[] lines = result.mContent.split(";", -1);

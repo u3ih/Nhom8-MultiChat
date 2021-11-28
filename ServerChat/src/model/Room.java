@@ -134,21 +134,22 @@ public class Room {
             User user = mListUser.get(i);
             if(user!=userJoin)
             {
-                user.Send(ActionType.NOTIFY_JUST_JOIN_ROOM, ResultCode.OK,idRoom +";"+ userJoin.getLastName());
+                user.Send(ActionType.NOTIFY_JUST_JOIN_ROOM, ResultCode.OK,idRoom +";"+ userJoin.getId());
             }
         }
     }
     public void NotifyJustLeaveRoom(User userLeave)
     {
         int size = mListUser.size();
+        if(mListUser.size()>0) {
         for (int i = 0; i < size; i++) 
         {
             User user = mListUser.get(i);
             if(user!=userLeave)
             {
-                user.Send(ActionType.NOTIFY_JUST_LEAVE_ROOM, ResultCode.OK, userLeave.getLastName());
+                user.Send(ActionType.NOTIFY_JUST_LEAVE_ROOM, ResultCode.OK,idRoom +";"+ userLeave.getId());
             }
-        }
+        }}
     }
 
 	public ArrayList<MessageRoom> getListMess() {
