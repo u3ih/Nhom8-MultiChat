@@ -367,6 +367,7 @@ public class ListForm extends javax.swing.JFrame implements Observer {
             	u.setGender(lines[5]);
             	u.setOnline(Boolean.parseBoolean(lines[6]));
             	u.setId(Integer.parseInt(lines[7]));
+            	u.setUsername(lines[8]);
             	p.checkFriend(u);
             	break;
             }
@@ -382,6 +383,7 @@ public class ListForm extends javax.swing.JFrame implements Observer {
             	u.setGender(lines[5]);
             	u.setOnline(Boolean.parseBoolean(lines[6]));
             	u.setId(Integer.parseInt(lines[7]));
+            	u.setUsername(lines[8]);
             	p.setOfflineFriend(u);
             	break;
             }

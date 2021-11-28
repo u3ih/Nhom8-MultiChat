@@ -58,7 +58,6 @@ public class FriendListForm extends javax.swing.JPanel implements Observer{
     		if(listUserFriendModel.get(i).getId() == user.getId()) {
     			tmp=i;
     		}
-    		
     	}
     	if(tmp != -1) {
     		user.setOnline(true);

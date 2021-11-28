@@ -216,7 +216,7 @@ public class ServerManager extends Observable
                 			int uid=controlUser.selectIDbyuname(uname);
                 			User user1 = controlUser.selectAllInfoAUserByID(uid);
                 			user1.setOnline(false);
-        					String res=user1.getFirstName()+";"+user1.getMidName()+";"+user1.getLastName()+";"+user1.getBirthDay()+";"+Integer.toString(user1.getAge())+";"+user1.getGender()+";"+user1.isOnline()+";"+user1.getId();
+        					String res=user1.getFirstName()+";"+user1.getMidName()+";"+user1.getLastName()+";"+user1.getBirthDay()+";"+Integer.toString(user1.getAge())+";"+user1.getGender()+";"+user1.isOnline()+";"+user1.getId()+";"+user1.getUsername();
                     		usersk.Send(actionType, ResultCode.OK, res);
                     		notifyObservers(res);
                 		}
@@ -230,7 +230,7 @@ public class ServerManager extends Observable
                 			int uid=controlUser.selectIDbyuname(uname);
                 			User user1 = controlUser.selectAllInfoAUserByID(uid);
                 			user1.setOnline(true);
-        					String res=user1.getFirstName()+";"+user1.getMidName()+";"+user1.getLastName()+";"+user1.getBirthDay()+";"+Integer.toString(user1.getAge())+";"+user1.getGender()+";"+user1.isOnline()+";"+user1.getId();
+        					String res=user1.getFirstName()+";"+user1.getMidName()+";"+user1.getLastName()+";"+user1.getBirthDay()+";"+Integer.toString(user1.getAge())+";"+user1.getGender()+";"+user1.isOnline()+";"+user1.getId()+";"+user1.getUsername();
                     		usersk.Send(actionType, ResultCode.OK, res);
                     		notifyObservers(res);
                 		}
