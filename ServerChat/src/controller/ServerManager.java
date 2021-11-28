@@ -215,6 +215,20 @@ public class ServerManager extends Observable
                 		}
                 	}
                 }
+                else if(actionType.equals(ActionType.CALL_OFFLINE)) {
+                	String uname=lines[1];
+                	for(int j=0;j<size;j++) {
+                		if(j!=i) {
+                			User usersk=mListUserOnline.get(j);
+                			int uid=controlUser.selectIDbyuname(uname);
+                			User user1 = controlUser.selectAllInfoAUserByID(uid);
+                			user1.setOnline(true);
+        					String res=user1.getFirstName()+";"+user1.getMidName()+";"+user1.getLastName()+";"+user1.getBirthDay()+";"+Integer.toString(user1.getAge())+";"+user1.getGender()+";"+user1.isOnline()+";"+user1.getId();
+                    		usersk.Send(actionType, ResultCode.OK, res);
+                    		notifyObservers(res);
+                		}
+                	}
+                }
                 else 
                 {
                 	ProcessRequest(user, request);

@@ -231,6 +231,7 @@ public class ListForm extends javax.swing.JFrame implements Observer {
 
 	private void btnLogoutActionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
+		mclientManager.callOffline(mclientManager.mNickname);
     	mclientManager.Logout();
     	mclientManager.Dispose();
     	loginForm.setEmptyText();
@@ -308,7 +309,7 @@ public class ListForm extends javax.swing.JFrame implements Observer {
                 newThreadRoom.run();;
                 listThread.put(lines[0], newThreadRoom);
                 r.setListModel(new Room(lines[0],createNameRoom,1,"null"));
-                mclientManager.GetListRoom();
+//                mclientManager.GetListRoom();
                 break;
             }
             case ActionType.JOIN_ROOM:
@@ -337,6 +338,21 @@ public class ListForm extends javax.swing.JFrame implements Observer {
             	u.setOnline(Boolean.parseBoolean(lines[6]));
             	u.setId(Integer.parseInt(lines[7]));
             	p.checkFriend(u);
+            	break;
+            }
+            case ActionType.CALL_OFFLINE:
+            {
+            	String[] lines = result.mContent.split(";", -1);
+            	User u= new User();
+            	u.setFirstName(lines[0]);
+            	u.setMidName(lines[1]);
+            	u.setLastName(lines[2]);
+            	u.setBirthDay(lines[3]);
+            	u.setAge(Integer.parseInt(lines[4]));
+            	u.setGender(lines[5]);
+            	u.setOnline(Boolean.parseBoolean(lines[6]));
+            	u.setId(Integer.parseInt(lines[7]));
+            	p.setOfflineFriend(u);
             	break;
             }
             case ActionType.Close_WINDOW_CHAT:

@@ -71,6 +71,20 @@ public class FriendListForm extends javax.swing.JPanel implements Observer{
     	}
     	
     }
+    public void setOfflineFriend(User user) {
+    	int tmp=-1;
+    	for(int i=0;i<listUserFriendModel.size();i++) {
+    		if(listUserFriendModel.get(i).getId() == user.getId()) {
+    			tmp=i;
+    		}
+    		
+    	}
+    	if(tmp != -1) {
+    		user.setOnline(false);
+    		listUserFriendModel.set(tmp, user);
+    	}
+    	
+    }
     public void setListModel(User u) {
     	listUserFriendModel.addElement(u);
     }

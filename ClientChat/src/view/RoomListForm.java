@@ -67,7 +67,7 @@ public class RoomListForm extends javax.swing.JPanel implements Observer {
 	public void initList(Result result) {
         
 	   System.out.println(result.mContent.length());
-    if(result.mContent.length()>0 || result.mContent != "")
+    if(result.mContent.length()>0 )
     {
         for(int i=0;i<listRoomModel.getSize();i++) {
         	listRoomModel.remove(i);
