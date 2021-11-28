@@ -53,7 +53,6 @@ public class RoomListForm extends javax.swing.JPanel implements Observer {
     	listRoomModel = (DefaultListModel<Room>) list.getModel();
     	clientManager.GetListRoom();
 
-        
     }
     
     public void addThread(String id, ThreadNewRoom thread) {
@@ -112,6 +111,7 @@ public class RoomListForm extends javax.swing.JPanel implements Observer {
     		public void mouseClicked(MouseEvent e) {
     			int s = list.getSelectedIndex();
 				Room room = listRoomModel.elementAt(s);
+				//System.out.println(room.getIdRoom() + " id room");
                 if(listThread.containsKey(room.getIdRoom())) {
                 	return;
                 }
@@ -175,6 +175,7 @@ public class RoomListForm extends javax.swing.JPanel implements Observer {
                 		System.out.println(r.toString());
                 		listRoomModel.remove(i);
                 		listRoomModel.addElement(r);
+                		
                 		return;
                 	}
                 }
