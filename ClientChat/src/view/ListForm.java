@@ -350,6 +350,7 @@ public class ListForm extends javax.swing.JFrame implements Observer {
             			u.setId(Integer.parseInt(infos[7]));
             			
             			ThreadNewFriend newThreadFriend = new ThreadNewFriend(new ChatForm(mclientManager, infos[8]));
+            			newThreadFriend.run();
                         listThreadFriend.put(infos[8], newThreadFriend);
             			p.setListModel(u);
             		}
@@ -357,7 +358,7 @@ public class ListForm extends javax.swing.JFrame implements Observer {
         		}
         		else
         		{
-        			JOptionPane.showMessageDialog(null, result.mContent, "Tháº¥t báº¡i", JOptionPane.ERROR_MESSAGE);
+        			JOptionPane.showMessageDialog(null, result.mContent, "Thất bại", JOptionPane.ERROR_MESSAGE);
         		}
             	break;
             }

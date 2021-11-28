@@ -34,10 +34,6 @@ import model.ResultCode;
  */
 public class ChatForm extends javax.swing.JFrame implements Observer{
 
-    /**
-     * Creates new form chatGroupForm
-     * 
-     */
 	ClientManager mClientManager;
     String mUserFriend;
     JFrame fileJFrame = new JFrame();
@@ -47,7 +43,6 @@ public class ChatForm extends javax.swing.JFrame implements Observer{
     public ChatForm(ClientManager clientManager, String mUserFriend) {
         initComponents();
         this.mClientManager = clientManager;
-        //System.out.println(mUserFriend+ " mUserFriend");
         this.mUserFriend = mUserFriend;
         mClientManager.addObserver(this);
         //mClientManager.getMess(mMaPhong);
@@ -303,7 +298,7 @@ Result result = (Result)arg;
                 if(username.equals(mClientManager.mNickname))
                     txtNoiDungChat.append("Me Send file: "+ result.file.getName() +"\n");
                 else
-                    txtNoiDungChat.append(sender + " send file " + result.file.getName() + "\n");
+                    txtNoiDungChat.append(username + " send file " + result.file.getName() + "\n");
                 //System.out.println(result.file.getName());
                 mod.addElement(result.file);
                 break;

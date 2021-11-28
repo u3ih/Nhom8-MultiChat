@@ -632,7 +632,7 @@ public class ServerManager extends Observable
                 	String listFriend = "";
                 	for(User u:list) {
                      listFriend += u.getFirstName() +"<col>" +u.getMidName()+"<col>" +u.getLastName()+"<col>" 
-                	+u.getBirthDay()+"<col>" +u.getAge()+"<col>" +u.getGender()+"<col>"+u.isOnline()+"<col>"+u.getId()+ "<row>";    
+                	+u.getBirthDay()+"<col>" +u.getAge()+"<col>" +u.getGender()+"<col>"+u.isOnline()+"<col>"+u.getId()+"<col>"+u.getUsername()+"<col>"+u.getPassword()+"<row>";    
                     }
                     //System.out.print(listFriend);
                     user.Send(actionType, ResultCode.OK, listFriend);
