@@ -2,24 +2,24 @@
 package view;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Observable;
 import java.util.Observer;
 
 import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
+import javax.swing.ListSelectionModel;
 
 import controller.ClientManager;
 import model.ActionType;
 import model.Result;
 import model.ResultCode;
 import model.Room;
+import model.ThreadNewFriend;
 import model.ThreadNewRoom;
 import model.User;
 
@@ -37,26 +37,22 @@ public class FriendListForm extends javax.swing.JPanel implements Observer{
 	private DefaultListModel<User> listUserFriendModel;
 	private JScrollPane scrollPane;
 	private GroupLayout groupLayout;
-	ChatForm chatFrm = new ChatForm();
-    public FriendListForm(ClientManager clientManager) {
+	private HashMap<String,ThreadNewFriend> listThread = new HashMap<String,ThreadNewFriend>();
+	
+    public FriendListForm(ClientManager clientManager, HashMap<String,ThreadNewFriend> listThread) {
         initComponents();
         this.clientManager = clientManager;
+        this.listThread = listThread;
     	clientManager.addObserver(this);
     	listUserFriendModel = (DefaultListModel<User>) list.getModel();
     	clientManager.GetListFriend(clientManager.mNickname);
-//    	list.addListSelectionListener(new ListSelectionListener() {
-//			
-//			@Override
-//			public void valueChanged(ListSelectionEvent e) {
-//				int s = list.getSelectedIndex();
-//				//Room room = listRoomModel.elementAt(s);
-//				User user = listUserFriendModel.elementAt(s);
-////				ThreadNewRoom newThreadRoom = new ThreadNewRoom(new ChatGroupForm(clientManager,room.getIdRoom(),room.getNameRoom(),room.getCountPeople()));
-////                newThreadRoom.run();
-////                clientManager.getMess(room.getIdRoom());
-//			}
-//		});
+
     }
+    
+    public void addThread(String id, ThreadNewFriend thread) {
+    	listThread.put(id, thread);
+    }
+    
     public void checkFriend(User user) {
     	int tmp=-1;
     	for(int i=0;i<listUserFriendModel.size();i++) {
@@ -71,6 +67,20 @@ public class FriendListForm extends javax.swing.JPanel implements Observer{
     	}
     	
     }
+    public void setOfflineFriend(User user) {
+    	int tmp=-1;
+    	for(int i=0;i<listUserFriendModel.size();i++) {
+    		if(listUserFriendModel.get(i).getId() == user.getId()) {
+    			tmp=i;
+    		}
+    		
+    	}
+    	if(tmp != -1) {
+    		user.setOnline(false);
+    		listUserFriendModel.set(tmp, user);
+    	}
+    	
+    }
     public void setListModel(User u) {
     	listUserFriendModel.addElement(u);
     }
@@ -81,12 +91,16 @@ public class FriendListForm extends javax.swing.JPanel implements Observer{
         {
             //ds ban có dạng firstname<col>midname<col>lastname<col>birthday<col>age<col>gender<col><row>
             //                firstname<col>midname<col>lastname<col>birthday<col>age<col>gender<col><row>
+        	for(int i=0;i<listUserFriendModel.getSize();i++) {
+        		listUserFriendModel.remove(i);
+	        }
             String[] rows = result.mContent.split("<row>");
             for (int i = 0; i < rows.length; i++) //hàng đầu là trống
             {
                 String[] cols = rows[i].split("<col>");
                // listUserFriendModel.addElement(new Room(cols[0],cols[1],Integer.parseInt(cols[2])));
-                listUserFriendModel.addElement(new User(Integer.parseInt(cols[7]),cols[0],cols[1],cols[2],cols[3],Integer.parseInt(cols[4]),cols[5],Boolean.parseBoolean(cols[6])));
+                System.out.println(cols[8]);
+                listUserFriendModel.addElement(new User(Integer.parseInt(cols[7]),cols[0],cols[1],cols[2],cols[3],Integer.parseInt(cols[4]),cols[5],Boolean.parseBoolean(cols[6]),cols[8],cols[9]));
             }
         }
     	
@@ -118,100 +132,31 @@ public class FriendListForm extends javax.swing.JPanel implements Observer{
     				.addContainerGap())
     	);
     	list = new JList<User>(new DefaultListModel<User>());
+    	list.setDragEnabled(true);
+    	list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    	list.addMouseListener(new MouseAdapter() {
+    		@Override
+    		public void mouseClicked(MouseEvent e) {
+    			int s = list.getSelectedIndex();
+				User user = listUserFriendModel.elementAt(s);
+				//System.out.println(user);
+                if(listThread.containsKey(user.getUsername())) {
+                	return;
+                }
+                else {
+    				ThreadNewFriend newThreadFriend = new ThreadNewFriend(new ChatForm(clientManager, user.getUsername()));
+    				newThreadFriend.run();
+                    listThread.put(user.getUsername(), newThreadFriend);
+                }
+                
+                list.setSelectedIndex(0);
+    		}
+    	});
+    	
     	list.setCellRenderer(new UserFriendListElement());
     	scrollPane.setViewportView(list);
     	this.setLayout(groupLayout);
-//        jPanel1 = new javax.swing.JPanel();
-//        jPanel1.addMouseListener(new MouseAdapter() {
-//        	@Override
-//        	public void mouseClicked(MouseEvent e) {
-//        		chatFrm.setVisible(true);
-//        	}
-//        });
-        
-//        jLabel1 = new javax.swing.JLabel();
-//        jLabel2 = new javax.swing.JLabel();
-//        jPanel2 = new javax.swing.JPanel();
-//        jLabel3 = new javax.swing.JLabel();
-//        jLabel4 = new javax.swing.JLabel();
-//
-//        setBackground(new java.awt.Color(255, 255, 255));
-//
-//        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-//        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Image/10207-man-student-light-skin-tone-icon-32.png"))); // NOI18N
-//
-//        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-//        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Image/icons8-green-circle-48.png"))); // NOI18N
-//        jLabel2.setText("Ä�ang hoáº¡t Ä‘á»™ng");
-//
-//        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-//        jPanel1.setLayout(jPanel1Layout);
-//        jPanel1Layout.setHorizontalGroup(
-//            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-//            .addGroup(jPanel1Layout.createSequentialGroup()
-//                .addContainerGap()
-//                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
-//                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-//                .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-//                .addContainerGap())
-//        );
-//        jPanel1Layout.setVerticalGroup(
-//            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-//            .addGroup(jPanel1Layout.createSequentialGroup()
-//                .addContainerGap()
-//                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-//                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-//                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 76, Short.MAX_VALUE))
-//                .addContainerGap())
-//        );
-//
-//        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-//        jLabel3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Image/10207-man-student-light-skin-tone-icon-32.png"))); // NOI18N
-//
-//        jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Image/icons8-red-circle-48.png"))); // NOI18N
-//        jLabel4.setText("KhÃ´ng hoáº¡t Ä‘á»™ng");
-//
-//        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-//        jPanel2.setLayout(jPanel2Layout);
-//        jPanel2Layout.setHorizontalGroup(
-//            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-//            .addGroup(jPanel2Layout.createSequentialGroup()
-//                .addContainerGap()
-//                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
-//                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-//                .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, 322, Short.MAX_VALUE)
-//                .addContainerGap())
-//        );
-//        jPanel2Layout.setVerticalGroup(
-//            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-//            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-//                .addContainerGap()
-//                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-//                    .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, 85, Short.MAX_VALUE)
-//                    .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-//                .addContainerGap())
-//        );
-//
-//        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-//        this.setLayout(layout);
-//        layout.setHorizontalGroup(
-//            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-//            .addGroup(layout.createSequentialGroup()
-//                .addContainerGap()
-//                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-//                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-//                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-//                .addContainerGap())
-//        );
-//        layout.setVerticalGroup(
-//            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-//            .addGroup(layout.createSequentialGroup()
-//                .addContainerGap()
-//                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-//                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-//                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-//                .addContainerGap(20, Short.MAX_VALUE))
-//        );
+
     }// </editor-fold>//GEN-END:initComponents
 
 
@@ -239,7 +184,29 @@ public class FriendListForm extends javax.swing.JPanel implements Observer{
         		initList(result);
         		break;
         	}
-        	
+        	case ActionType.SEND_MESSAGE:
+            {
+                String[] lines = result.mContent.split(";", -1);
+                String sender = lines[1];
+                String messContent = lines[2];
+                for(int i=0;i<listUserFriendModel.size();i++){
+//                	if(listUserFriendModel.elementAt(i).getUsername().equals(lines[0])) 
+//                	{
+//                		User u = listUserFriendModel.elementAt(i);
+//                		//u.setLastMess(sender +": "+ messContent);
+//                		//System.out.println(r.toString());
+//                		listUserFriendModel.remove(i);
+//                		listUserFriendModel.addElement(u);
+//                		
+//                		return;
+//                	}
+                }
+                break;
+            }
+        	case ActionType.Close_WINDOW_CHAT:
+            {
+            	if (listThread.containsKey(result.mContent)) listThread.remove(result.mContent);
+            }
         }
 	}		
 }

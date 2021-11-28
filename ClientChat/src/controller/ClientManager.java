@@ -157,9 +157,38 @@ public class ClientManager extends Observable{
         }
     }
     
+    public void SendMessFriend(String mUserFriend, String mess)
+    {
+        mess = mess.replaceAll("\\n", "<br>");
+        String line = ActionType.SEND_MESSAGE_FRIEND+ ";" + mUserFriend + ";" + mess;
+        try 
+        {
+            mBufferWriter.write(line + "\n");
+            mBufferWriter.flush();
+        } catch (IOException ex) {
+            Result result = new Result("", ResultCode.ERROR, "Không thể kết nối tới server");
+            notifyObservers(result);
+        }
+    }
+    
     public void SendFile(String maPhong, DataFile file)
     {
         String line = ActionType.SEND_FILE + ";" + maPhong + "; " ;
+        try 
+        {
+        	mBufferWriter.write(line + "\n");
+            mBufferWriter.flush();
+            mObjectOutputStream.writeObject(file);
+            mObjectOutputStream.flush();
+        } catch (IOException ex) {
+            Result result = new Result("", ResultCode.ERROR, "Không thể kết nối tới server");
+            notifyObservers(result);
+        }
+    }
+    
+    public void SendFileFriend(String friendUsername, DataFile file)
+    {
+        String line = ActionType.SEND_FILE_FRIEND + ";" + friendUsername + "; " ;
         try 
         {
         	mBufferWriter.write(line + "\n");
@@ -255,6 +284,20 @@ public class ClientManager extends Observable{
             notifyObservers(result);
         }
     }
+    
+    public void GetRoomById()
+    {
+        String line = ActionType.GET_ROOM_BY_ID + ";";
+        try
+        {
+            mBufferWriter.write(line + "\n");
+            mBufferWriter.flush();
+        } catch (IOException ex) {
+            Result result = new Result("", ResultCode.ERROR, "Không thể kết nối tới server");
+            notifyObservers(result);
+        }
+    }
+    
     public void GetListFriend(String uname)
     {
         String line = ActionType.GET_LIST_FRIEND + ";"+uname;

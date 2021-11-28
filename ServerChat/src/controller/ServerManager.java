@@ -137,7 +137,7 @@ public class ServerManager extends Observable
                         }
                         
                         mListUserOnline.add(newUser);
-                        System.out.println(mListUserOnline);
+                        //System.out.println(mListUserOnline);
                     }
                 }catch (IOException ex) {
                     notifyObservers("Lỗi kết nối");
@@ -202,7 +202,11 @@ public class ServerManager extends Observable
                 	file = user.ReadFile();
                 	System.out.println("file: " + file.getName());
                 	ProcessSendFile(user, roomID, file);
-                } else if(actionType.equals(ActionType.CALL_ONLINE)) {
+                } else if (actionType.equals(ActionType.SEND_FILE_FRIEND)) {
+                	file = user.ReadFile();
+                	System.out.println("file: " + file.getName());
+                	ProcessSendFileFriend(user, roomID, file);
+                }	else if(actionType.equals(ActionType.CALL_ONLINE)) {
                 	String uname=lines[1];
                 	for(int j=0;j<size;j++) {
                 		if(j!=i) {
@@ -210,6 +214,20 @@ public class ServerManager extends Observable
                 			int uid=controlUser.selectIDbyuname(uname);
                 			User user1 = controlUser.selectAllInfoAUserByID(uid);
                 			user1.setOnline(false);
+        					String res=user1.getFirstName()+";"+user1.getMidName()+";"+user1.getLastName()+";"+user1.getBirthDay()+";"+Integer.toString(user1.getAge())+";"+user1.getGender()+";"+user1.isOnline()+";"+user1.getId();
+                    		usersk.Send(actionType, ResultCode.OK, res);
+                    		notifyObservers(res);
+                		}
+                	}
+                }
+                else if(actionType.equals(ActionType.CALL_OFFLINE)) {
+                	String uname=lines[1];
+                	for(int j=0;j<size;j++) {
+                		if(j!=i) {
+                			User usersk=mListUserOnline.get(j);
+                			int uid=controlUser.selectIDbyuname(uname);
+                			User user1 = controlUser.selectAllInfoAUserByID(uid);
+                			user1.setOnline(true);
         					String res=user1.getFirstName()+";"+user1.getMidName()+";"+user1.getLastName()+";"+user1.getBirthDay()+";"+Integer.toString(user1.getAge())+";"+user1.getGender()+";"+user1.isOnline()+";"+user1.getId();
                     		usersk.Send(actionType, ResultCode.OK, res);
                     		notifyObservers(res);
@@ -256,8 +274,21 @@ public class ServerManager extends Observable
     }
     
     void ProcessSendFile(User user, String roomID, DataFile file) {     
-        notifyObservers(user.getLastName() + " vừa gửi file");
+        //notifyObservers(user.getLastName() + " vừa gửi file");
         user.getRoom(roomID).SendFileToAllUser(user.getLastName(), file, user.getUsername());
+    }
+    void ProcessSendFileFriend(User user, String friendUsername, DataFile file) {     
+        //notifyObservers(user.getLastName() + " vừa gửi file");
+    	User userFriend = new User();
+    	boolean check = false;
+    	for(User u: mListUserOnline) {
+    		if(u.getUsername().equals(friendUsername)) {
+    			userFriend = u;
+    			check = true;
+    		}
+    	}
+        user.SendFile(ActionType.SEND_FILE, ResultCode.OK, + userFriend.getId() + ";" +user.getUsername() +";", file);
+        if(check) userFriend.SendFile(ActionType.SEND_FILE, ResultCode.OK, userFriend.getId() + ";" +user.getUsername() +";", file);
     }
     
     void ProcessRequest(User user, String request)
@@ -299,20 +330,19 @@ public class ServerManager extends Observable
             {
                 List<Room> list = roomDAO.getRoomByUserID(user.getId());
                 
-                
                 int size = list.size();
-                System.out.println(size);
+                //System.out.println(size);
                 if(size>0)
                 {
-                	for(Room room:list) {
-                        System.out.println(room.toString());    
-                       }
+//                	for(Room room:list) {
+//                        System.out.println(room.toString());    
+//                       }
                 	String listRoom = "";
                 	for(Room room:list) {
                      listRoom += room.getIdRoom() + "<col>" + room.getNameRoom() + "<col>" 
                             + room.getCountPeople() + "<col>" + room.getLastMess() + "<col>" + "<row>";    
                     }
-                    System.out.print(listRoom);
+                    //System.out.print(listRoom);
                     user.Send(actionType, ResultCode.OK, listRoom);
                 }else
                 {
@@ -355,22 +385,38 @@ public class ServerManager extends Observable
             {
             	
                 List<String> list = roomDAO.getRoomMember(lines[1]);//query cÃ³ dáº¡ng actionType;
-                System.out.println(list.size() + "\n");
+                //System.out.println(list.size() + "\n");
                 int size = list.size();
                 if(size>0)
                 {
                     String listMess = "";
                     for (int i = 0; i < size; i++) 
                     {
-                        
-                            String name = list.get(i);
-                            listMess+= name + ";";
-                        
+                        String name = list.get(i);
+                        listMess+= name + ";";
                         
                     }
                     user.Send(actionType, ResultCode.OK,lines[1] + ";" + listMess);
                     
                     
+                }else
+                {
+                    user.Send(actionType, ResultCode.OK, "");
+                }
+                notifyObservers(user.getLastName() + " vừa lấy danh sách thành viên");
+                break;
+            }
+            case ActionType.GET_ROOM_BY_ID:
+            {
+            	
+                Room room = roomDAO.getRoomInfo(lines[1]);//query cÃ³ dáº¡ng actionType;
+                //System.out.println(list.size() + "\n");
+                if(room != null)
+                {
+                	String listRoom = room.getIdRoom() + "<col>" + room.getNameRoom() + "<col>" 
+                            + room.getCountPeople() + "<col>" + room.getLastMess() + "<col>" + "<row>";    
+
+                    user.Send(actionType, ResultCode.OK, listRoom);
                 }else
                 {
                     user.Send(actionType, ResultCode.OK, "");
@@ -422,6 +468,27 @@ public class ServerManager extends Observable
                 roomDAO.InsertMess(user.getRoom(lines[1]).getIdRoom(), user.getId(), contentMess);
                 roomDAO.UpdateLastMess(user.getRoom(lines[1]).getIdRoom(),user.getUsername()+": "+ contentMess);
                 notifyObservers(user.getUsername() + " vừa gửi tin");
+                break;
+            }
+            
+            case ActionType.SEND_MESSAGE_FRIEND:
+            {
+            	User userFriend = new User();
+            	boolean check = false;
+            	for(User u: mListUserOnline) {
+            		if(u.getUsername().equals(lines[1])) {
+            			userFriend = u;
+            			check = true;
+            		}
+            	}
+                String contentMess = "";
+                if(lines.length>=2)
+                    contentMess = lines[2];   //query cÃ³ dáº¡ng actionType;contentMess
+                user.Send(ActionType.SEND_MESSAGE, ResultCode.OK, + userFriend.getId() + ";" +user.getUsername() +";"+ contentMess);
+                if(check) userFriend.Send(ActionType.SEND_MESSAGE, ResultCode.OK, userFriend.getId() + ";" +user.getUsername() +";"+  contentMess);
+                //roomDAO.InsertMess(user.getRoom(lines[1]).getIdRoom(), user.getId(), contentMess);
+                //roomDAO.UpdateLastMess(user.getRoom(lines[1]).getIdRoom(),user.getUsername()+": "+ contentMess);
+                //notifyObservers(user.getUsername() + " vừa gửi tin");
                 break;
             }
             
@@ -541,7 +608,7 @@ public class ServerManager extends Observable
 				}
 				if(check) {
 					User user1 = controlUser.selectAllInfoAUserByID(a);
-					String res=user1.getFirstName()+";"+user1.getMidName()+";"+user1.getLastName()+";"+user1.getBirthDay()+";"+Integer.toString(user1.getAge())+";"+user1.getGender()+";"+user1.isOnline()+";"+user1.getId();
+					String res=user1.getFirstName()+";"+user1.getMidName()+";"+user1.getLastName()+";"+user1.getBirthDay()+";"+Integer.toString(user1.getAge())+";"+user1.getGender()+";"+user1.isOnline()+";"+user1.getId() +";"+user1.getUsername() +";"+user1.getPassword();
             		user.Send(actionType, ResultCode.OK, res);
             		mListFriend.add(user1);
             	}
@@ -564,15 +631,15 @@ public class ServerManager extends Observable
                 int size = list.size();       
                 if(size>0)
                 {
-                	for(User u:list) {
-                        System.out.println(u.toString());    
-                       }
+//                	for(User u:list) {
+//                        System.out.println(u.toString());    
+//                       }
                 	String listFriend = "";
                 	for(User u:list) {
                      listFriend += u.getFirstName() +"<col>" +u.getMidName()+"<col>" +u.getLastName()+"<col>" 
-                	+u.getBirthDay()+"<col>" +u.getAge()+"<col>" +u.getGender()+"<col>"+u.isOnline()+"<col>"+u.getId()+ "<row>";    
+                	+u.getBirthDay()+"<col>" +u.getAge()+"<col>" +u.getGender()+"<col>"+u.isOnline()+"<col>"+u.getId()+"<col>"+u.getUsername()+"<col>"+u.getPassword()+"<row>";    
                     }
-                    System.out.print(listFriend);
+                    //System.out.print(listFriend);
                     user.Send(actionType, ResultCode.OK, listFriend);
                 }else
                 {

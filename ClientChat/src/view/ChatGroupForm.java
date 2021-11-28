@@ -269,7 +269,7 @@ Result result = (Result)arg;
         
         if(result.mResultCode.equals(ResultCode.ERROR))
         {
-            JOptionPane.showMessageDialog(null, result.mContent, "ThÃ¡ÂºÂ¥t bÃ¡ÂºÂ¡i", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, result.mContent, "Thất bại", JOptionPane.ERROR_MESSAGE);
             return;
         }
         switch (result.mActionType)
@@ -284,8 +284,6 @@ Result result = (Result)arg;
                 messContent = messContent.replaceAll("<br>", "\n");  //khi tin nhÃ¡ÂºÂ¯n gÃ¡Â»Â­i Ã„â€˜i Ã„â€˜Ä‚Â£ thay kÄ‚Â½ tÃ¡Â»Â± xuÃ¡Â»â€˜ng dÄ‚Â²ng bÃ¡ÂºÂ±ng <br> nÄ‚Âªn khi nhÃ¡ÂºÂ­n vÃ¡Â»ï¿½ thÄ‚Â¬ thay ngÃ†Â°Ã¡Â»Â£c lÃ¡ÂºÂ¡i
                 if(sender.equals(mClientManager.mNickname))
                 	txtNoiDungChat.append("Me: " + messContent + "\n");
-                
-                
                 
                 else
                 	txtNoiDungChat.append(sender + ": " + messContent + "\n");
@@ -323,7 +321,7 @@ Result result = (Result)arg;
                 if(username.equals(mClientManager.mNickname))
                     txtNoiDungChat.append("Me Send file: "+ result.file.getName() +"\n");
                 else
-                    txtNoiDungChat.append(sender + " send file " + result.file.getName() + "\n");
+                    txtNoiDungChat.append(username + " send file " + result.file.getName() + "\n");
                 //System.out.println(result.file.getName());
                 mod.addElement(result.file);
                 break;

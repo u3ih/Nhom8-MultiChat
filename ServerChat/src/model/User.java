@@ -310,6 +310,7 @@ public class User {
 
     public Boolean Send(String actionType, String resultCode, String content)
     {
+    	System.out.println(content);
         try 
         {
             mDataOutputStream.writeUTF(actionType + ";" + resultCode + ";" + content);

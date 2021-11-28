@@ -25,4 +25,7 @@ public class ActionType {
     public static final String GET_Online = "21";
     public static final String 	CALL_ONLINE = "call";
     public static final String 	CALL_OFFLINE = "calloff";
+    public static final String SEND_MESSAGE_FRIEND = "send_mess_fiend";
+    public static final String SEND_FILE_FRIEND = "send_file_fiend";
+    public static final String GET_ROOM_BY_ID = "get_room_by_id";
 }

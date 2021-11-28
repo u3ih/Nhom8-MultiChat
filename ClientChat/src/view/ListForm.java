@@ -22,6 +22,7 @@ import model.ActionType;
 import model.Result;
 import model.ResultCode;
 import model.Room;
+import model.ThreadNewFriend;
 import model.ThreadNewRoom;
 import model.User;
 
@@ -46,6 +47,7 @@ public class ListForm extends javax.swing.JFrame implements Observer {
 	 private String createNameRoom = "";
 	 private String findIDRoom = "";
 	 private HashMap<String,ThreadNewRoom> listThread = new HashMap<String,ThreadNewRoom>();
+	 private HashMap<String,ThreadNewFriend> listThreadFriend = new HashMap<String,ThreadNewFriend>();
 	 private RoomListForm r;
 	 private FriendListForm p;
 	
@@ -54,7 +56,10 @@ public class ListForm extends javax.swing.JFrame implements Observer {
         this.mclientManager = clientManager;
         this.loginForm = loginForm;
         clientManager.addObserver(this);
-        
+    }
+    
+    public void setListThreadFriend(HashMap<String,ThreadNewFriend> listThreadFriend) {
+    	this.listThreadFriend = listThreadFriend;
     }
 
     /**
@@ -141,7 +146,7 @@ public class ListForm extends javax.swing.JFrame implements Observer {
 			
 			@Override
 			public void ancestorAdded(AncestorEvent event) {
-				 p=new FriendListForm(mclientManager);
+				 p=new FriendListForm(mclientManager, listThreadFriend);
                 tabbedPane.add(p,"danh sách bạn");
                 r= new RoomListForm(mclientManager,listThread);
                 tabbedPane.add(r,"danh sách phòng");
@@ -231,6 +236,7 @@ public class ListForm extends javax.swing.JFrame implements Observer {
 
 	private void btnLogoutActionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
+		mclientManager.callOffline(mclientManager.mNickname);
     	mclientManager.Logout();
     	mclientManager.Dispose();
     	loginForm.setEmptyText();
@@ -239,7 +245,7 @@ public class ListForm extends javax.swing.JFrame implements Observer {
 	}
     protected void btntim(ActionEvent e) {
 		// TODO Auto-generated method stub
-    	friendAddForm faf= new friendAddForm(this, mclientManager,p);
+    	friendAddForm faf= new friendAddForm(this, mclientManager,p, listThreadFriend);
 		faf.setVisible(true);
 	}
 
@@ -308,9 +314,9 @@ public class ListForm extends javax.swing.JFrame implements Observer {
                 newThreadRoom.run();;
                 listThread.put(lines[0], newThreadRoom);
                 r.setListModel(new Room(lines[0],createNameRoom,1,"null"));
-//              mclientManager.GetListRoom();
                 break;
             }
+            
             case ActionType.JOIN_ROOM:
             {
             	String[] lines = result.mContent.split(";", -1);
@@ -324,6 +330,38 @@ public class ListForm extends javax.swing.JFrame implements Observer {
                 //r.setListModel(new Room(findIDRoom,lines[0],Integer.parseInt(lines[1])));
                 break;
            }
+            case ActionType.Ket_Ban:
+            {
+            	if(result.mResultCode.equals(ResultCode.OK)) {
+            		if(result.mContent.equals("error")) {
+            			JOptionPane.showMessageDialog(null, "Đã kết bạn với người dùng này", "Thất bại", JOptionPane.ERROR_MESSAGE);
+            		}
+            		else {
+            			JOptionPane.showMessageDialog(null, "Kết bạn thành công", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+            			String[] infos=result.mContent.split(";");
+            			User u = new User();
+            			u.setFirstName(infos[0]);
+            			u.setMidName(infos[1]);
+            			u.setLastName(infos[2]);
+            			u.setBirthDay(infos[3]);
+            			u.setAge(Integer.parseInt(infos[4]));
+            			u.setGender(infos[5]);
+            			u.setOnline(Boolean.parseBoolean(infos[6]));
+            			u.setId(Integer.parseInt(infos[7]));
+            			
+            			ThreadNewFriend newThreadFriend = new ThreadNewFriend(new ChatForm(mclientManager, infos[8]));
+            			newThreadFriend.run();
+                        listThreadFriend.put(infos[8], newThreadFriend);
+            			p.setListModel(u);
+            		}
+        			
+        		}
+        		else
+        		{
+        			JOptionPane.showMessageDialog(null, result.mContent, "Thất bại", JOptionPane.ERROR_MESSAGE);
+        		}
+            	break;
+            }
             case ActionType.CALL_ONLINE:
             {
             	String[] lines = result.mContent.split(";", -1);
@@ -337,6 +375,21 @@ public class ListForm extends javax.swing.JFrame implements Observer {
             	u.setOnline(Boolean.parseBoolean(lines[6]));
             	u.setId(Integer.parseInt(lines[7]));
             	p.checkFriend(u);
+            	break;
+            }
+            case ActionType.CALL_OFFLINE:
+            {
+            	String[] lines = result.mContent.split(";", -1);
+            	User u= new User();
+            	u.setFirstName(lines[0]);
+            	u.setMidName(lines[1]);
+            	u.setLastName(lines[2]);
+            	u.setBirthDay(lines[3]);
+            	u.setAge(Integer.parseInt(lines[4]));
+            	u.setGender(lines[5]);
+            	u.setOnline(Boolean.parseBoolean(lines[6]));
+            	u.setId(Integer.parseInt(lines[7]));
+            	p.setOfflineFriend(u);
             	break;
             }
             case ActionType.Close_WINDOW_CHAT:

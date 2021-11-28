@@ -13,4 +13,5 @@ public class Common {
     public static final String jdbcUrl = "jdbc:mysql://localhost:3306/chat?useSSL=false";
     public static final String jdbcUsername = "root";
     public static final String jdbcPassword = "Hungblo123";
+
 }
