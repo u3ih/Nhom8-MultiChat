@@ -35,14 +35,11 @@ public class ServerManager extends Observable
     ArrayList<User> mListUserOnline = new ArrayList<>();
     ArrayList<Room> mListRoom = new ArrayList<>();
     ArrayList<User> mListUserWaitLogout = new ArrayList<>();
-    UserDAO controlUser = new UserDAO();
-<<<<<<< HEAD
-    HashMap<String,User> mListUser = controlUser.selectAllUsers();    
-=======
+    UserDAO controlUser = new UserDAO();  
+
     ArrayList<User> mListFriend = new ArrayList<>();
     HashMap<String,User> mListUser = controlUser.selectAllUsers();
     
->>>>>>> 737569c (pull)
     DataInputStream mDataInputStream;
     DataOutputStream mDataOutputStream;
     RoomDAO roomDAO = new RoomDAO();

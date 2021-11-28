@@ -45,7 +45,7 @@ public class ChatForm extends javax.swing.JFrame implements Observer{
         this.mClientManager = clientManager;
         this.mUserFriend = mUserFriend;
         mClientManager.addObserver(this);
-        mClientManager.getMessBox(mClientManager.mNickname,mUserFriend);
+        mClientManager.getMessBox(mClientManager.mNickname, mUserFriend);
     }
 
    
@@ -283,7 +283,7 @@ Result result = (Result)arg;
     	        			String sender = cols[0];
     	        			String messContent = cols[1];
     	        			System.out.println(sender + ": "+ messContent);
-    	        			System.out.println(lines[0]+ " name room" + " /"+sender+mUserFriend + "/ " +sender+mClientManager.mNickname+ " /"+mUserFriend+sender);
+    	        			//System.out.println(lines[0]+ " name room" + " /"+sender+mUserFriend + "/ " +sender+mClientManager.mNickname+ " /"+mUserFriend+sender);
     	        			if(lines[0].equals(sender+mUserFriend) || lines[0].equals(mClientManager.mNickname+mUserFriend)) {
 	    	        			if(sender.equals(mClientManager.mNickname))
 	    	        				txtNoiDungChat.append("Me: " + messContent + "\n");
