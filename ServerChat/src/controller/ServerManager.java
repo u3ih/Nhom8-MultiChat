@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Random;
@@ -36,11 +37,11 @@ public class ServerManager extends Observable
     ArrayList<Room> mListRoom = new ArrayList<>();
     ArrayList<User> mListUserWaitLogout = new ArrayList<>();
     UserDAO controlUser = new UserDAO();
-    HashMap<String,User> mListUser = controlUser.selectAllUsers();
-    
+    HashMap<String,User> mListUser = controlUser.selectAllUsers();    
     DataInputStream mDataInputStream;
     DataOutputStream mDataOutputStream;
     RoomDAO roomDAO = new RoomDAO();
+    HashMap<String,Room> listRoom = roomDAO.getAllRoom();
     
     public ServerManager(Observer obs)  //hàm khởi tạo khi chưa có socket
     {
@@ -268,6 +269,7 @@ public class ServerManager extends Observable
             case ActionType.LOGIN:
             {
                     user.setOnline(true);
+                    userLogined(user);
                     user.Send(actionType, ResultCode.OK, "OK");
                     try {
                     	controlUser.updateOnline(user);
@@ -284,6 +286,7 @@ public class ServerManager extends Observable
             	String roomName = lines[1];  //query cÄ‚Â³ dÃ¡ÂºÂ¡ng actionType;roomName
                 Room room = GeneralRoom(roomName);
                 mListRoom.add(room);
+                listRoom.put(room.getIdRoom(), room);
                 user.addRoom(room.getIdRoom(), room);
                 if(user.Send(actionType, ResultCode.OK, room.getIdRoom()))
                     room.AddUser(user);
@@ -378,13 +381,11 @@ public class ServerManager extends Observable
             case ActionType.JOIN_ROOM:
             {
                 String maPhong = lines[1];   //query cÃ³ dáº¡ng actionType;maPhong
-                int size = mListRoom.size();
                 boolean success = false;
-                for (int i = 0; i < size; i++) 
-                {
-                    Room room = mListRoom.get(i);
-                    if(room.getIdRoom().equals(maPhong))
+                    Room room = listRoom.get(maPhong);
+                    if(room!=null)
                     {
+                    	success = true;
                     	if(user.getmRoom().containsKey(room.getIdRoom())) {
                     		user.Send(actionType, ResultCode.ERROR, "Bạn đã ở trong phòng");
                     		return;
@@ -396,13 +397,13 @@ public class ServerManager extends Observable
                         user.addRoom(room.getIdRoom(),room);
                         String count = room.getmListUser().size()+"";
                         user.Send(actionType, ResultCode.OK, room.getNameRoom() + ";" + count);
-                        notifyObservers(user.getUsername() + " vá»«a tham gia phÃ²ng " + room.getIdRoom());
+                        notifyObservers(user.getUsername() + " vừa tham gia phòng" + room.getIdRoom());
                         //user.getRoom(room.getIdRoom()).UpdateNumberUser();
                         user.getRoom(room.getIdRoom()).NotifyJustJoinRoom(user);
                         success = true;
                     	}
                     }
-                }
+                
                 if(success==false)
                 {
                     user.Send(actionType, ResultCode.ERROR, "Không tìm thấy phòng");
@@ -417,7 +418,7 @@ public class ServerManager extends Observable
                 String contentMess = "";
                 if(lines.length>=2)
                     contentMess = lines[2];   //query cÃ³ dáº¡ng actionType;contentMess
-                user.getRoom(lines[1]).SendToAllUser(lines[1]+";"+user.getUsername(), contentMess);
+                listRoom.get(lines[1]).SendToAllUser(lines[1]+";"+user.getUsername(), contentMess);
                 roomDAO.InsertMess(user.getRoom(lines[1]).getIdRoom(), user.getId(), contentMess);
                 roomDAO.UpdateLastMess(user.getRoom(lines[1]).getIdRoom(),user.getUsername()+": "+ contentMess);
                 notifyObservers(user.getUsername() + " vừa gửi tin");
@@ -426,39 +427,29 @@ public class ServerManager extends Observable
             
             case ActionType.LEAVE_ROOM:    //query có dạng actionType;
             {
-                Room room = user.getRoom("gf");
+                Room room = user.getRoom(lines[1]);
                 room.RemoveUser(user);
                 if(room.CountUser()>0)
                 {
                     room.NotifyJustLeaveRoom(user);
-                    room.UpdateNumberUser();
                 }
                 else
-                    mListRoom.remove(room);
-                user.setmRoom(null);
+                    listRoom.remove(room.getIdRoom());
+                user.removeRoom(lines[1]);
+                roomDAO.deleteRoomConnection(lines[1], user.getId());
                 notifyObservers(user.getUsername() + " vừa rời phòng");
                 break;
             }
             case ActionType.LOGOUT:    //query có dạng actionType;
             {
-                Room room = user.getRoom("gfd");
+                
                 user.setOnline(false);
                 try {
                 	controlUser.updateOnline(user);
                 }catch (Exception e) {
 					// TODO: handle exception
 				}
-                if(room!=null)
-                {
-                    room.RemoveUser(user);
-                    if(room.CountUser()>0)
-                    {
-                        room.NotifyJustLeaveRoom(user);
-                        room.UpdateNumberUser();
-                    }
-                    else
-                        mListRoom.remove(room);
-                }
+                
                 //vì mListUser luôn được sử dụng bởi thread đợi kết quả, nên can thiệp vào giữa chừng rất dễ gây lỗi
                 //Nên ta sử dụng một list hàng đợi, thread đợi kết quả sẽ xóa các user này khi duyệt đợi kết quả xong
                 mListUserWaitLogout.add(user); 
@@ -625,14 +616,22 @@ public class ServerManager extends Observable
     //Kiểm tra mã phòng đã tồn tại hay chưa, true là chưa, false là rồi
     boolean CheckMaPhong(String maPhong)
     {
-        int size = mListRoom.size();
-        for (int i = 0; i < size; i++) 
-        {
-            Room room = mListRoom.get(i);
-            if(room.getIdRoom().equals(maPhong))
-                return false;
-        }
+    	for(Map.Entry<String, Room> entry : listRoom.entrySet()) {
+			 Room room = entry.getValue();
+			 if(room.getIdRoom().equals(maPhong))
+	                return false;
+		}
+    	
         return true;
+    }
+    
+    private void userLogined(User user) {
+    	List<String> list = roomDAO.getListRoomID(user.getId());
+    	for(String i :list) {
+    		Room r = listRoom.get(i);
+    		r.AddUser(user);
+    		user.addRoom(r.getIdRoom(), r);
+    	}
     }
     
     //Random ngẫu nhiên một chuỗi
@@ -655,6 +654,6 @@ public class ServerManager extends Observable
     }
     public int CountRoom()
     {
-        return mListRoom.size();
+        return listRoom.size();
     }
 }

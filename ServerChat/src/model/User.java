@@ -253,6 +253,12 @@ public class User {
 		listRoom.add(room);
 	}
 	
+	public void removeRoom(String idRoom) {
+		listRoom.remove(mRoom.get(idRoom));
+		mRoom.remove(idRoom);
+		
+	}
+	
 	public Room getRoom(String idRoom) {
 		Room room = mRoom.get(idRoom);
 		return room;

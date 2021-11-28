@@ -315,9 +315,9 @@ public class ClientManager extends Observable{
             notifyObservers(result);
         }
     }
-    public void LeaveRoom()
+    public void LeaveRoom(String roomID)
     {
-        String line = ActionType.LEAVE_ROOM + ";null";
+        String line = ActionType.LEAVE_ROOM + ";roomID";
         try
         {
             mBufferWriter.write(line + "\n");

@@ -10,6 +10,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import Common.Common;
@@ -88,8 +89,9 @@ public class RoomDAO {
     	return list;
     }
     
-    public List<Room> getAllRoom(){
-    	List<Room> list = new ArrayList<Room>();
+    public HashMap<String,Room> getAllRoom(){
+    	HashMap<String,Room> map = new HashMap<String, Room>();
+    	//List<Room> list = new ArrayList<Room>();
     	
     	try (Connection c = getConnection();
                 PreparedStatement prepare = c.prepareStatement(GET_ALL_ROOM)) {
@@ -100,7 +102,7 @@ public class RoomDAO {
     			String nameRoom = rs.getString("roomName");
     			int countPeople = rs.getInt("numberofuser");
     			Room r = new Room(idRoom, nameRoom, countPeople);
-    			list.add(r);
+    			map.put(idRoom, r);
     		}
             
             c.close();
@@ -109,7 +111,7 @@ public class RoomDAO {
         } catch (Exception e) {
         	System.out.println(e);
         }
-    	return list;
+    	return map;
     }
     
     public int InsertMess(String roomID, int userID, String content) {
