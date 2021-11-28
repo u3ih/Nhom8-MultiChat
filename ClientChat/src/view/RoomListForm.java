@@ -50,6 +50,9 @@ public class RoomListForm extends javax.swing.JPanel implements Observer {
 	private JScrollPane scrollPane;
 	private GroupLayout groupLayout;
 	private HashMap<String,ThreadNewRoom> listThread = new HashMap<String,ThreadNewRoom>();
+	private int time;
+	private JPopupMenu menu;
+	private TimerThread thread;
 	
     public RoomListForm(ClientManager clientManager, HashMap<String,ThreadNewRoom> listThread) {
     	initComponents();
@@ -58,6 +61,7 @@ public class RoomListForm extends javax.swing.JPanel implements Observer {
     	clientManager.addObserver(this);
     	listRoomModel = (DefaultListModel<Room>) list.getModel();
     	clientManager.GetListRoom();
+    	
 
     }
     
@@ -121,27 +125,92 @@ public class RoomListForm extends javax.swing.JPanel implements Observer {
     		@Override
     		public void mouseClicked(MouseEvent e) {
 
-    			int s = list.getSelectedIndex();
-				Room room = listRoomModel.elementAt(s);
-                if(listThread.containsKey(room.getIdRoom())) {
-                	return;
-                }
-                else {
-    				ThreadNewRoom newThreadRoom = new ThreadNewRoom(new ChatGroupForm(clientManager,room.getIdRoom(),room.getNameRoom(),room.getCountPeople()));
-                	newThreadRoom.run();				
-                    listThread.put(room.getIdRoom(), newThreadRoom);
-                }
-                
-                list.setSelectedIndex(0);
+//    			int s = list.getSelectedIndex();
+//				Room room = listRoomModel.elementAt(s);
+//                if(listThread.containsKey(room.getIdRoom())) {
+//                	return;
+//                }
+//                else {
+//    				ThreadNewRoom newThreadRoom = new ThreadNewRoom(new ChatGroupForm(clientManager,room.getIdRoom(),room.getNameRoom(),room.getCountPeople()));
+//                	newThreadRoom.run();				
+//                    listThread.put(room.getIdRoom(), newThreadRoom);
+//                }
+//                
+//                list.setSelectedIndex(0);
 
     		}
     		
+    		@Override
+    		public void mousePressed(MouseEvent e) {
+    			time = 0;
+    			thread = new TimerThread(list,e);
+    			thread.start();
+    		}
+    		@Override
+    		public void mouseReleased(MouseEvent e) {
+    			thread.stop();
+    			if(time<=1) {
+        			int s = list.getSelectedIndex();
+    				Room room = listRoomModel.elementAt(s);
+                    if(listThread.containsKey(room.getIdRoom())) {
+                    	return;
+                    }
+                    else {
+        				ThreadNewRoom newThreadRoom = new ThreadNewRoom(new ChatGroupForm(clientManager,room.getIdRoom(),room.getNameRoom(),room.getCountPeople()));
+                    	newThreadRoom.run();				
+                        listThread.put(room.getIdRoom(), newThreadRoom);
+                    }
+                    
+                    list.setSelectedIndex(0);
+    			}
+    		}
     	});
     	
     	list.setCellRenderer(new RoomListElement());
     	scrollPane.setViewportView(list);
     	this.setLayout(groupLayout);
     }// </editor-fold>//GEN-END:initComponents
+    
+    private class TimerThread extends Thread{
+    	JList list;
+    	MouseEvent e;
+    	
+    	public TimerThread(JList list, MouseEvent e) {
+    		this.e = e;
+    		this.list = list;
+    	}
+    	
+    	@Override
+    	public void run() {
+    		while(true){
+                try {
+                    if(time == 2){
+                    	menu = new JPopupMenu();
+                    	JMenuItem item = new JMenuItem("Rời room");
+                        menu.add(item);
+                        item.addActionListener(new ActionListener() {
+
+                			@Override
+                			public void actionPerformed(ActionEvent e) {
+                				int index = list.getSelectedIndex();
+                				clientManager.LeaveRoom(listRoomModel.elementAt(index).getIdRoom());
+                				//listRoomModel.remove(index);
+                			}
+                        	
+                        });
+                        menu.show(list, e.getX(), e.getY());
+                        break;
+                    }
+                    time++;
+                    Thread.sleep(600);
+                    System.out.println(time);
+                    
+                } catch (Exception e) {
+                }
+            }
+    		
+    	}
+    }
 
 	@Override
 	public void update(Observable o, Object arg) {
@@ -196,6 +265,7 @@ public class RoomListForm extends javax.swing.JPanel implements Observer {
         	case ActionType.Close_WINDOW_CHAT:
             {
             	if (listThread.containsKey(result.mContent)) listThread.remove(result.mContent);
+            	break;
             }
         	case ActionType.LEAVE_ROOM:
         	{
