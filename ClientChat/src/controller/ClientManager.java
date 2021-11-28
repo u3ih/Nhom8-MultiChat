@@ -360,7 +360,7 @@ public class ClientManager extends Observable{
     }
     public void LeaveRoom(String roomID)
     {
-        String line = ActionType.LEAVE_ROOM + ";roomID";
+        String line = ActionType.LEAVE_ROOM + ";" + roomID;
         try
         {
             mBufferWriter.write(line + "\n");

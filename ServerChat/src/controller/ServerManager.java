@@ -494,15 +494,18 @@ public class ServerManager extends Observable
             
             case ActionType.LEAVE_ROOM:    //query có dạng actionType;
             {
-                Room room = user.getRoom(lines[1]);
+                Room room = user.getmRoom().get(lines[1]);
+                System.out.println(room.toString());
                 room.RemoveUser(user);
                 if(room.CountUser()>0)
                 {
                     room.NotifyJustLeaveRoom(user);
                 }
                 else
-                    listRoom.remove(room.getIdRoom());
+                    
                 user.removeRoom(lines[1]);
+                listRoom.remove(room.getIdRoom());
+                user.Send(actionType, ResultCode.OK, lines[1]);
                 roomDAO.deleteRoomConnection(lines[1], user.getId());
                 notifyObservers(user.getUsername() + " vừa rời phòng");
                 break;

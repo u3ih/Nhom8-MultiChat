@@ -117,5 +117,4 @@ public class RoomListElement extends javax.swing.JPanel implements ListCellRende
 		}
 		return this;
 	}
-	
 }

@@ -8,8 +8,11 @@ import java.util.Observer;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -26,6 +29,9 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
 import controller.ClientManager;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -103,27 +109,37 @@ public class RoomListForm extends javax.swing.JPanel implements Observer {
     				.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 280, Short.MAX_VALUE)
     				.addContainerGap())
     	);
+    	JPopupMenu menu = new JPopupMenu();
+    	JMenuItem item = new JMenuItem("Rời room");
+    	menu.add(item);
     	list = new JList<Room>(new DefaultListModel<Room>());
     	list.setDragEnabled(true);
     	list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     	list.addMouseListener(new MouseAdapter() {
+    		
+    		
     		@Override
     		public void mouseClicked(MouseEvent e) {
-    			int s = list.getSelectedIndex();
-				Room room = listRoomModel.elementAt(s);
-				//System.out.println(room.getIdRoom() + " id room");
-                if(listThread.containsKey(room.getIdRoom())) {
-                	return;
-                }
-                else {
-    				ThreadNewRoom newThreadRoom = new ThreadNewRoom(new ChatGroupForm(clientManager,room.getIdRoom(),room.getNameRoom(),room.getCountPeople()));
-                	newThreadRoom.run();				
-                    listThread.put(room.getIdRoom(), newThreadRoom);
-                    
-                }
-                
-                list.setSelectedIndex(0);
+    			
+    			
+    			
+    				int s = list.getSelectedIndex();
+    				Room room = listRoomModel.elementAt(s);
+    				
+    				//System.out.println(room.getIdRoom() + " id room");
+    				if(listThread.containsKey(room.getIdRoom())) {
+    					return;
+    				}
+    				else {
+    					ThreadNewRoom newThreadRoom = new ThreadNewRoom(new ChatGroupForm(clientManager,room.getIdRoom(),room.getNameRoom(),room.getCountPeople()));
+    					newThreadRoom.run();				
+    					listThread.put(room.getIdRoom(), newThreadRoom);                  
+    				} 
+    				list.setSelectedIndex(0);
+    			
+    			
     		}
+    		
     	});
     	
     	list.setCellRenderer(new RoomListElement());
@@ -185,6 +201,19 @@ public class RoomListForm extends javax.swing.JPanel implements Observer {
             {
             	if (listThread.containsKey(result.mContent)) listThread.remove(result.mContent);
             }
+        	case ActionType.LEAVE_ROOM:
+        	{
+        		
+        		for(int i=0;i<listRoomModel.size();i++){
+                	if(listRoomModel.elementAt(i).getIdRoom().equals(result.mContent)) 
+                	{              		
+                		listRoomModel.remove(i);	
+                		
+                		return;
+                	}
+                }
+        		break;
+        	}
         	
         }
 	}
