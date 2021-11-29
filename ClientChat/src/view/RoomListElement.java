@@ -112,8 +112,13 @@ public class RoomListElement extends javax.swing.JPanel implements ListCellRende
 	public Component getListCellRendererComponent(JList<? extends Room> list, Room value, int index, boolean isSelected,
 			boolean cellHasFocus) {
 		if(value!=null) {
-		this.jLabel2.setText(value.getNameRoom());
-		this.jLabel3.setText(value.getLastMess());
+			this.jLabel2.setText(value.getNameRoom());
+			if(value.getLastMess() == "null" || value.getLastMess() == null) {
+				this.jLabel3.setText("phòng chưa có tin nhắn");
+			}
+			else {
+				this.jLabel3.setText(value.getLastMess());
+			}
 		}
 		return this;
 	}

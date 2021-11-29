@@ -30,6 +30,7 @@ public class RoomDAO {
             "(id,numberOfUser,roomname) VALUES " + "(?,?,?)";
     private static final String ADD_ROOM_CONNECTION = "INSERT INTO roomConnection (roomID, userID)" +
             "VALUES (?, ?)";
+    private static final String DELETE_ROOM = "DELETE FROM room where id = ?";
     private static final String DELETE_ROOM_CONNECTION = "DELETE FROM roomConnection where roomID = ? AND userID = ?";
     private static final String SELECT_ROOM_MEMBER_BY_ROMID = "select user.username from roomconnection "+
     					"inner join user on roomconnection.userid = user.id "+
@@ -126,6 +127,22 @@ public class RoomDAO {
             prepare.setString(1, roomID);
             prepare.setString(3, content);
             prepare.setInt(2, userID);
+            s = prepare.executeUpdate();
+            c.close();
+            prepare.close();
+            
+        } catch (Exception e) {
+        	System.out.println(e);
+        }
+        return s;
+    }
+    
+    public int deleteRoom(String roomID) {
+    	int s = 0;
+        try (Connection c = getConnection();
+                PreparedStatement prepare = c.prepareStatement(DELETE_ROOM)) {
+            
+            prepare.setString(1, roomID);
             s = prepare.executeUpdate();
             c.close();
             prepare.close();

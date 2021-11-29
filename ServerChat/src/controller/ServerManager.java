@@ -585,16 +585,20 @@ public class ServerManager extends Observable
                 Room room = user.getmRoom().get(lines[1]);
                 System.out.println(room.toString());
                 room.RemoveUser(user);
+                roomDAO.deleteRoomConnection(lines[1], user.getId());
                 if(room.CountUser()>0)
                 {
                     room.NotifyJustLeaveRoom(user);
                 }
-                else
+                else {
+                	roomDAO.deleteRoom(lines[1]);
+                }
+                
                     
                 user.removeRoom(lines[1]);
                 listRoom.remove(room.getIdRoom());
                 user.Send(actionType, ResultCode.OK, lines[1]);
-                roomDAO.deleteRoomConnection(lines[1], user.getId());
+                
                 notifyObservers(user.getUsername() + " vừa rời phòng");
                 break;
             }
