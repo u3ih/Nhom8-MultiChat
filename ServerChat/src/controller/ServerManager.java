@@ -592,11 +592,11 @@ public class ServerManager extends Observable
                 }
                 else {
                 	roomDAO.deleteRoom(lines[1]);
+                	listRoom.remove(room.getIdRoom());
                 }
                 
                     
                 user.removeRoom(lines[1]);
-                listRoom.remove(room.getIdRoom());
                 user.Send(actionType, ResultCode.OK, lines[1]);
                 
                 notifyObservers(user.getUsername() + " vừa rời phòng");
